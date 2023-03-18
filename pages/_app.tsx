@@ -3,13 +3,32 @@
 import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
 import { ToastContainer } from "react-toastify";
+import Auth from "components/Auth";
+import Layout from "components/layout";
+import type { ReactElement, ReactNode } from "react";
+import type { NextPage } from "next";
 import "react-toastify/dist/ReactToastify.css";
+import "pages/index.css";
 
-const App = ({ Component, pageProps }: AppProps) => {
-  console.log("pageProps: ", pageProps);
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+  auth?: boolean;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+const App = ({ Component, pageProps }: AppPropsWithLayout) => {
+  const getLayout = Component.getLayout || ((page) => <Layout>{page}</Layout>);
+
   return (
     <SessionProvider session={pageProps.session}>
-      <Component {...pageProps} />
+      {Component.auth ? (
+        <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
+      ) : (
+        getLayout(<Component {...pageProps} />)
+      )}
       <ToastContainer
         position="bottom-left"
         autoClose={5000}

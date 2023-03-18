@@ -5,6 +5,7 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from "next-auth/providers/credentials";
+import EmailProvider from "next-auth/providers/email"
 import prisma from '../../../lib/prisma';
 import { compare } from 'bcrypt';
 
@@ -44,7 +45,11 @@ export const authOptions: NextAuthOptions = {
         }
         return user;
       },
-    })
+    }),
+    EmailProvider({
+      server: process.env.MAIL_SERVER,
+      from: "<no-reply@example.com>",
+    }),
   ],
   adapter: PrismaAdapter(prisma),
   secret: process.env.SECRET,
@@ -61,7 +66,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token, user }) {
       // Send properties to the client, like an access_token from a provider.
-      session.accessToken = token.accessToken
+      // session.accessToken = token.accessToken
       return session
     }
   }

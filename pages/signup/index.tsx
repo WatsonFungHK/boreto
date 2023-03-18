@@ -116,4 +116,6 @@ const SignUpForm = () => {
   );
 };
 
+SignUpForm.getLayout = (page) => page;
+
 export default SignUpForm;

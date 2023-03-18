@@ -20,6 +20,11 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import axiosClient from "lib/axiosClient";
 import { useRouter } from "next/router";
+import { getCsrfToken } from "next-auth/react";
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from "next";
 
 const schema = object().shape({
   username: string().required("username.required"),
@@ -28,7 +33,15 @@ const schema = object().shape({
 
 type FormData = InferType<typeof schema>;
 
-const LoginForm = () => {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  return {
+    props: {
+      csrfToken: await getCsrfToken(context),
+    },
+  };
+}
+
+const LoginForm = ({ csrfToken }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -47,6 +60,7 @@ const LoginForm = () => {
       const response = await signIn("credentials", {
         redirect: false,
         ...formData,
+        csrfToken,
         // @ts-ignore
       });
 
@@ -120,10 +134,12 @@ const LoginForm = () => {
         </Stack>
       </form>
       <Typography variant="body2" sx={{ textDecoration: "none" }}>
-        Don't have an account? <Link href="/signup">Sign up</Link>
+        Don&apos;t have an account? <Link href="/signup">Sign up</Link>
       </Typography>
     </Stack>
   );
 };
+
+LoginForm.getLayout = (page) => page;
 
 export default LoginForm;
