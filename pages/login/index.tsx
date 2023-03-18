@@ -27,7 +27,7 @@ import type {
 } from "next";
 
 const schema = object().shape({
-  username: string().required("username.required"),
+  email: string().required("email.required"),
   password: string().min(8, "password.min").required("password.required"),
 });
 
@@ -69,7 +69,7 @@ const LoginForm = ({ csrfToken }) => {
         toast.success("Login successfully");
       }
     } catch (error) {
-      toast.error(error.response.data.error);
+      toast.error(error.response.data.error || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -96,9 +96,9 @@ const LoginForm = ({ csrfToken }) => {
             <Typography variant="subtitle2">{t("email")}</Typography>
             <TextField
               type="email"
-              {...register("username")}
-              error={!!errors.username}
-              helperText={errors.username && t(errors.username.message)}
+              {...register("email")}
+              error={!!errors.email}
+              helperText={errors.email && t(errors.email.message)}
             />
           </Stack>
           <Stack spacing={1}>
@@ -140,6 +140,7 @@ const LoginForm = ({ csrfToken }) => {
   );
 };
 
+LoginForm.auth = false;
 LoginForm.getLayout = (page) => page;
 
 export default LoginForm;

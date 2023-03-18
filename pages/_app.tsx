@@ -24,11 +24,12 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
 
   return (
     <SessionProvider session={pageProps.session}>
-      {Component.auth ? (
+      {/* {Component.auth !== false ? (
         <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
       ) : (
         getLayout(<Component {...pageProps} />)
-      )}
+      )} */}
+      {getLayout(<Component {...pageProps} />)}
       <ToastContainer
         position="bottom-left"
         autoClose={5000}

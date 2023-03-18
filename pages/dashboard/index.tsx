@@ -5,7 +5,7 @@ const DashboardPage = () => {
   return (
     <>
       <h1>Dashboard</h1>
-      {/* <p>Welcome back, {user?.username}!</p> */}
+      {/* <p>Welcome back, {user?.email}!</p> */}
       <p>{status}</p>
       <p>{JSON.stringify(user)}</p>
     </>

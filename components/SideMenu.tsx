@@ -13,7 +13,7 @@ import Link from "next/link";
 import Header from "./Header";
 import colors from "theme/colors";
 
-const menuItems = [
+export const menuItems = [
   { label: "Dashboard", icon: <DashboardIcon />, link: "/dashboard" },
   { label: "Customers", icon: <CustomersIcon />, link: "/customer" },
   { label: "Products", icon: <ProductsIcon />, link: "/product" },

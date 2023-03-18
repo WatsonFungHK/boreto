@@ -20,28 +20,28 @@ export const authOptions: NextAuthOptions = {
       name: "Credentials",
       // `credentials` is used to generate a form on the sign in page.
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+      // e.g. domain, email, password, 2FA token, etc.
       // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        email: { label: "Email", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, _) {
-        const { username, password } = credentials as {
-          username: string;
+        const { email, password } = credentials as {
+          email: string;
           password: string;
         };
-        if (!username || !password) {
-          throw new Error("Missing username or password");
+        if (!email || !password) {
+          throw new Error("Missing email or password");
         }
         const user = await prisma.user.findUnique({
           where: {
-            username,
+            email,
           },
         });
         // if user doesn't exist or password doesn't match
         if (!user || !(await compare(password, user.password))) {
-          throw new Error("Invalid username or password");
+          throw new Error("Invalid email or password");
         }
         return user;
       },
@@ -69,9 +69,10 @@ export const authOptions: NextAuthOptions = {
       // session.accessToken = token.accessToken
       return session
     }
+  },
+  pages: {
+    signIn: "/login",
   }
 };
 
-// const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, authOptions);
-// export default authHandler;
 export default NextAuth(authOptions)
