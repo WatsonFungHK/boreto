@@ -3,22 +3,16 @@ import { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "pages/api/auth/[...nextauth]";
 
-// index.tsx
-export const getStaticProps: GetStaticProps = async () => {
-  const feed = await prisma.post.findMany({
-    where: { published: true },
-    include: {
-      author: {
-        select: { name: true },
-      },
-    },
-  });
+export async function getServerSideProps({ req, res }) {
   return {
-    props: { feed },
-    revalidate: 10,
+    props: {
+      session: await getServerSession(req, res, authOptions),
+    },
   };
-};
+}
 
 type Props = {
   feed: PostProps[];
