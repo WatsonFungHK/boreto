@@ -8,6 +8,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email"
 import prisma from '../../../lib/prisma';
 import { compare } from 'bcrypt';
+import { User } from '@prisma/client'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -34,13 +35,12 @@ export const authOptions: NextAuthOptions = {
         if (!email || !password) {
           throw new Error("Missing email or password");
         }
-        const user = await prisma.user.findUnique({
+        const user: User = await prisma.user.findUnique({
           where: {
             email,
           },
         });
-        // if user doesn't exist or password doesn't match
-        if (!user || !(await compare(password, user.password))) {
+        if (!user || !(await compare(password, user?.password))) {
           throw new Error("Invalid email or password");
         }
         return user;
