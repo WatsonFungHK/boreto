@@ -7,10 +7,16 @@ import { companyId } from 'pages/api/constants'
 
 const update = async (req: NextApiRequest, res: NextApiResponse) => {
   const officeId = req.body.id;
-  const { updated_at, created_at, addresses, ...data } = req.body;
+  const { updated_at, created_at, addresses, users, ...data } = req.body;
   const updatedoffice = await prisma.office.update({
     where: { id: req.body.id },
-    data: data,
+    data: {
+      ...data,
+      users: {
+        set: users.map((id) => ({ id }))
+      }
+    },
+    
   });
 
   await Promise.all(
@@ -67,6 +73,18 @@ export default async function handler(
             where: {
               status: 'A'
             }
+          },
+          users: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              office: {
+                select: {
+                  name: true
+                }
+              }
+            }
           }
         }
       });
@@ -78,13 +96,16 @@ export default async function handler(
       if (req.body.id) {
         await update(req, res)
       } else {
-        const { updated_at, created_at, addresses, ...data } = req.body;
+        const { updated_at, created_at, addresses, users, ...data } = req.body;
         const response = await prisma.office.create({
           data: {
             ...data,
             companyId,
             addresses: {
               create: addresses
+            },
+            users: {
+              connect: users.map((id) => ({ id }))
             }
           }
         })

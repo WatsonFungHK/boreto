@@ -54,6 +54,7 @@ const AddressForm = ({ multiple = true }) => {
             justifyContent={"space-between"}
           >
             <Accordion
+              defaultExpanded={!multiple}
               sx={{
                 width: "100%",
                 ...(!deepEqual(errors, {}) && {

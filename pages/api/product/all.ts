@@ -3,14 +3,14 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma';
 import { getServerSession } from 'next-auth/next';
 
-const filterFields = ['name']
+const filterFields = ['name', 'description']
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    const { keyword, pageNumber, pageSize } = req.query;
+    const { keyword = '', pageNumber, pageSize } = req.query;
     const filterConditions = filterFields.map((field) => {
       return {
         [field]: {
@@ -25,6 +25,7 @@ export default async function handler(
       },
       OR: [...filterConditions]
     }
+    console.log('filterConditions: ', filterConditions);
    
     const _pageNumber = parseInt(pageNumber as string, 10) || 1;
     const _pageSize = parseInt(pageSize as string, 10) || 10;
@@ -40,8 +41,10 @@ export default async function handler(
           updated_at: 'desc'
         },
         where: whereClause,
-        skip,
-        take,
+        ...(pageNumber && {
+          skip,
+          take
+        }),
         include: {
           category: true,
         }

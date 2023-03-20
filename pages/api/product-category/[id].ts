@@ -25,19 +25,36 @@ export default async function handler(
     if (req.method === 'POST') {
       const session = await getSession()
       const id = req.body.id || cuid();
-      const { updated_at, created_at, ...data } = req.body;
+      const { updated_at, created_at, products, ...data } = req.body;
+
       const createBody = {...data, id, companyId };
       const response = await prisma.productCategory.upsert({
         where: {
           id,
         },
-        create: createBody,
-        update: data
+        create: {
+          ...data,
+          id,
+          companyId,
+          products: {
+            connect: products.map((id) => ({id}))
+          }
+        },
+        update: {
+          ...data,
+          products: {
+            set: products.map((id) => ({ id }))
+          }
+          // products: {
+          //   set: products.map((id) => ({ id }))
+          // }
+        }
       });
         
       res.status(200).json(response);
     }
   } catch (error) {
+    console.log('error: ', error);
     res.status(500).json({ error: error.message })
   }
 }

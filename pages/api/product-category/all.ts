@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma';
 import { getServerSession } from 'next-auth/next';
 
-const filterFields = ['name']
+const filterFields = ['name', 'description']
 
 export default async function handler(
   req: NextApiRequest,

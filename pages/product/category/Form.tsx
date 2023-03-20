@@ -16,31 +16,33 @@ import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import { string, object } from "yup";
+import { string, object, array } from "yup";
+import Autocomplete from "components/Autocomplete";
+import { useItems, getItem, upsertItem } from "lib/swr";
 
 const defaultValues = {
   name: "",
   description: "",
   status: "A",
+  products: [],
 };
 
 export const schema = object().shape({
   name: string().required("required"),
   description: string().optional(),
   status: string().optional(),
+  products: array().of(
+    object({
+      value: string(),
+      label: string(),
+    })
+  ),
 });
 
 export type FormData = ReturnType<typeof schema["cast"]>;
 
-const getItem = async (id: string) => {
-  const response = await axiosClient.get(`/api/product-category/${id}`);
-  return response.data;
-};
-
-const upsertItem = async (id: string, item: FormData) => {
-  const response = await axiosClient.post(`/api/product-category/${id}`, item);
-  return response.data;
-};
+const generateOptions = (items) =>
+  items.map(({ id, name }) => ({ value: id, label: name }));
 
 const ProductCategoryForm = ({}: {}) => {
   const router = useRouter();
@@ -64,6 +66,8 @@ const ProductCategoryForm = ({}: {}) => {
     formState: { errors },
   } = methods;
   const [isLoading, setIsLoading] = useState(false);
+  const { data: { total, items: allProducts } = { total: 0, items: [] } } =
+    useItems("/api/product/all");
 
   const { status } = watch();
 
@@ -72,9 +76,9 @@ const ProductCategoryForm = ({}: {}) => {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
-          const item = await getItem(id as string);
+          const item = await getItem(`/api/product-category/${id}`);
           if (item) {
-            reset(item);
+            reset({ ...item, products: generateOptions(item.products) });
           }
         } catch (err) {
           toast.error("Error fetching product category");
@@ -90,7 +94,10 @@ const ProductCategoryForm = ({}: {}) => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(id as string, data);
+      const response = await upsertItem(`/api/product-category/${id}`, {
+        ...data,
+        products: data.products.map(({ value }) => value),
+      });
       router.push("/product/category");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
@@ -138,6 +145,10 @@ const ProductCategoryForm = ({}: {}) => {
               />
             </FormControl>
           </Stack>
+          <Autocomplete
+            options={generateOptions(allProducts)}
+            name="products"
+          />
           <LoadingButton
             type="submit"
             variant="contained"

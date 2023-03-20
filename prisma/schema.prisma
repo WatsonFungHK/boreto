@@ -28,8 +28,8 @@ model User {
 }
 
 model Staff {
-  id          String    @id @default(cuid())
-  
+  id     String  @id @default(cuid())
+  gender String? // 'M' = Male, 'F' = 'Female, 'U' = 'Unspecified
 }
 
 model Department {
@@ -168,20 +168,20 @@ model ProductCategory {
 }
 
 model Product {
-  id          String          @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   description String?
   price       Int
-  categoryId  String
-  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  category    ProductCategory? @relation(fields: [categoryId], references: [id])
   images      ProductImage[]
   companyId   String
-  company     Company         @relation(fields: [companyId], references: [id])
+  company     Company          @relation(fields: [companyId], references: [id])
   unit        Int
-  status      String          @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
-  created_at  DateTime        @default(now())
-  updated_at  DateTime?       @updatedAt
-  prirces     ProductPrice[]
+  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at  DateTime         @default(now())
+  updated_at  DateTime?        @updatedAt
+  prices      ProductPrice[]
 }
 
 model ProductImage {

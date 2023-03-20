@@ -8,7 +8,12 @@ import colors from "theme/colors";
 
 const Header: React.FC = () => {
   const router = useRouter();
-  const { data: session, status } = useSession({ required: true });
+  // const { data: session, status } = useSession({ required: true });
+  const session = {
+    user: {
+      email: "1223",
+    },
+  };
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname;
 

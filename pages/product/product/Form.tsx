@@ -38,7 +38,7 @@ export const schema = object().shape({
   description: string().optional(),
   unit: number().positive().required("required"),
   price: number().positive().required("required"),
-  categoryId: string().required("required"),
+  categoryId: string().optional(),
   status: string().required("required"),
 });
 
@@ -81,7 +81,7 @@ const ProductForm = ({}: {}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (id) {
+    if (!isNew) {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
@@ -98,7 +98,7 @@ const ProductForm = ({}: {}) => {
 
       fetchItem();
     }
-  }, [id]);
+  }, [isNew]);
 
   const onSubmit = async (data: FormData) => {
     try {

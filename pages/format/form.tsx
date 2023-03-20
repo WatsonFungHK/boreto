@@ -3,16 +3,21 @@
 // always skip id, created_at, updated_at, companyId
 /**
  * 
-model Department {
-  id          String    @id @default(cuid())
+model Product {
+  id          String          @id @default(cuid())
   name        String
   description String?
+  price       Int
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
   companyId   String
-  company     Company   @relation(fields: [companyId], references: [id])
-  status      String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
-  created_at  DateTime  @default(now())
-  updated_at  DateTime? @updatedAt
-  users       User[]
+  company     Company         @relation(fields: [companyId], references: [id])
+  unit        Int
+  status      String          @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at  DateTime        @default(now())
+  updated_at  DateTime?       @updatedAt
+  prirces     ProductPrice[]
 }
  */
 

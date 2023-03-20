@@ -17,13 +17,17 @@ import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import { string, object, date, number } from "yup";
+import { string, object, date, number, array } from "yup";
+import useSWR from "swr";
+import Autocomplete from "components/Autocomplete";
+import useStaffOptions from "../hooks/useStaffOptions";
 
 // Define the schema for the form
 export const schema = object().shape({
   name: string().required("required"),
   description: string().optional(),
   status: string().default("A").oneOf(["A", "I", "D"]), // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  users: array(),
 });
 
 // Define the default form values
@@ -31,6 +35,7 @@ const defaultValues = {
   name: "",
   description: "",
   status: "A",
+  users: [],
 };
 
 // Define the possible values for the 'status' field
@@ -53,6 +58,14 @@ const upsertItem = async (id: string, item: FormData) => {
   return response.data;
 };
 
+const generateOptions = (items) =>
+  items.map(({ id, first_name, last_name, department }) => {
+    return {
+      value: id,
+      label: first_name + " " + last_name + " / " + department?.name,
+    };
+  });
+
 // Define the form component
 const DepartmentForm = () => {
   const router = useRouter();
@@ -65,6 +78,8 @@ const DepartmentForm = () => {
 
   // Set up the form validation and submission
   const { t } = useTranslation("common", { keyPrefix: "department" });
+  const staffOptions = useStaffOptions(generateOptions);
+
   const methods = useForm<FormData>({
     defaultValues,
     resolver: yupResolver(schema),
@@ -73,6 +88,8 @@ const DepartmentForm = () => {
     register,
     handleSubmit,
     reset,
+    watch,
+    control,
     formState: { errors },
   } = methods;
   const [isLoading, setIsLoading] = useState(false);
@@ -85,7 +102,7 @@ const DepartmentForm = () => {
           setIsLoading(true);
           const item = await getItem(id as string);
           if (item) {
-            reset(item);
+            reset({ ...item, users: generateOptions(item.users) });
           }
         } catch (err) {
           toast.error("Error fetching department");
@@ -102,7 +119,10 @@ const DepartmentForm = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(id as string, data);
+      const response = await upsertItem(id as string, {
+        ...data,
+        users: data.users.map(({ value }) => value),
+      });
       router.push("/company/department");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
@@ -154,6 +174,11 @@ const DepartmentForm = () => {
               )}
             </FormControl>
           </Stack>
+          <Autocomplete
+            options={staffOptions}
+            name="users"
+            subtitle={t("staff")}
+          />
           <LoadingButton
             type="submit"
             variant="contained"

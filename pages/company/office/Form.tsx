@@ -19,6 +19,8 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { string, object, array } from "yup";
 import AddressForm from "components/AddressForm";
+import Autocomplete from "components/Autocomplete";
+import useStaffOptions from "../hooks/useStaffOptions";
 
 const defaultValues = {
   name: "",
@@ -26,6 +28,7 @@ const defaultValues = {
   status: "A",
   type: "",
   addresses: [{}],
+  users: [],
 };
 
 export const schema = object().shape({
@@ -44,6 +47,7 @@ export const schema = object().shape({
       country: string().required("required"),
     })
   ),
+  users: array(),
 });
 
 export type FormData = ReturnType<typeof schema["cast"]>;
@@ -57,6 +61,14 @@ const upsertItem = async (id: string, item: FormData) => {
   const response = await axiosClient.post(`/api/office/${id}`, item);
   return response.data;
 };
+
+const generateOptions = (items) =>
+  items.map(({ id, first_name, last_name, office }) => {
+    return {
+      value: id,
+      label: first_name + " " + last_name + " / " + office?.name,
+    };
+  });
 
 const ProductCategoryForm = ({}: {}) => {
   const router = useRouter();
@@ -80,19 +92,18 @@ const ProductCategoryForm = ({}: {}) => {
     formState: { errors },
   } = methods;
   const [isLoading, setIsLoading] = useState(false);
+  const staffOptions = useStaffOptions(generateOptions);
 
   const { status } = watch();
 
   useEffect(() => {
     if (!isNew) {
-      console.log("isNew: ", isNew);
       const fetchItem = async () => {
-        console.log("fetchItem");
         try {
           setIsLoading(true);
           const item = await getItem(id as string);
           if (item) {
-            reset(item);
+            reset({ ...item, users: generateOptions(item.users) });
           }
         } catch (err) {
           toast.error("error-fetching-item");
@@ -108,7 +119,10 @@ const ProductCategoryForm = ({}: {}) => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(id as string, data);
+      const response = await upsertItem(id as string, {
+        ...data,
+        users: data.users.map(({ value }) => value),
+      });
       router.push("/company/office");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
@@ -119,7 +133,7 @@ const ProductCategoryForm = ({}: {}) => {
   };
   return (
     <Stack spacing={2}>
-      <Typography variant="h5">Create Office</Typography>
+      <Typography variant="h5">{t(isNew ? "create" : "update")}</Typography>
       <FormProvider {...methods}>
         <Stack spacing={2} direction="column">
           <Stack spacing={1}>
@@ -178,6 +192,11 @@ const ProductCategoryForm = ({}: {}) => {
               )}
             </FormControl>
           </Stack>
+          <Autocomplete
+            options={staffOptions}
+            name="users"
+            subtitle={t("staff")}
+          />
           <AddressForm multiple={false} />
           <LoadingButton
             type="submit"
