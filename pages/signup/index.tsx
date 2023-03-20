@@ -61,7 +61,7 @@ const SignUpForm = ({ csrfToken }) => {
       await axiosClient.post("/api/auth/register", formData);
 
       await signIn("credentials", {
-        redirect: false,
+        redirect: true,
         email: formData.email,
         password: formData.password,
         csrfToken,
@@ -83,6 +83,7 @@ const SignUpForm = ({ csrfToken }) => {
       justifyContent="center"
       alignItems="center"
       style={{ minHeight: "100vh" }}
+      spacing={2}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}

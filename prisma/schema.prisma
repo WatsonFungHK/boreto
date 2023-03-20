@@ -8,31 +8,94 @@ generator client {
 }
 
 model User {
-  id         String    @id @default(cuid())
-  first_name String?
-  last_name  String?
-  email      String    @unique
-  password   String
-  createdAt  DateTime  @default(now()) @map(name: "created_at")
-  updatedAt  DateTime  @updatedAt @map(name: "updated_at")
-  Account    Account[]
-  Session    Session[]
-  company    Company?  @relation(fields: [companyId], references: [id])
-  companyId  String?
+  id           String      @id @default(cuid())
+  first_name   String?
+  last_name    String?
+  email        String      @unique
+  password     String
+  createdAt    DateTime    @default(now()) @map(name: "created_at")
+  updatedAt    DateTime    @updatedAt @map(name: "updated_at")
+  Account      Account[]
+  Session      Session[]
+  company      Company?    @relation(fields: [companyId], references: [id])
+  companyId    String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
+  officeId     String?
+  office       Office?     @relation(fields: [officeId], references: [id])
 
   @@map(name: "users")
 }
 
+model Staff {
+  id          String    @id @default(cuid())
+  
+}
+
+model Department {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id])
+  status      String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  users       User[]
+}
+
+model Address {
+  id          String    @id @default(cuid())
+  line_1      String
+  line_2      String?
+  line_3      String?
+  city        String?
+  state       String?
+  country     String
+  postal_code String?
+  status      String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  type        String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?
+  officeId    String?
+  office      Office?   @relation(fields: [officeId], references: [id])
+}
+
+model Office {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id])
+  type        String    @default("O") // 'O' = Office, 'W' = Warehouse
+  status      String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  addresses   Address[]
+  users       User[]
+}
+
 model Company {
-  id        String   @id @default(cuid())
-  name      String
-  address   String?
-  phone     String?
-  email     String?
-  website   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User[]
+  id                           String            @id @default(cuid())
+  name                         String
+  legal_name                   String?
+  business_registration_number String?
+  address                      String?
+  phone                        String?
+  email                        String?
+  website                      String?
+  createdAt                    DateTime          @default(now())
+  updatedAt                    DateTime          @updatedAt
+  defaultLocale                String            @default("en")
+  defaultCurrency              String            @default("HKD")
+  User                         User[]
+  Customer                     Customer[]
+  ProductCategory              ProductCategory[]
+  Product                      Product[]
+  Department                   Department[]
+  Office                       Office[]
 }
 
 model Account {
@@ -71,4 +134,73 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Customer {
+  id            String    @id @default(cuid())
+  first_name    String?
+  last_name     String?
+  nick_name     String?
+  gender        String? // 'M' = Male, 'F' = 'Female, 'U' = 'Unspecified
+  email         String?
+  phone_number  String?
+  credit_amount Int       @default(0)
+  birth_date    String?
+  joined_date   String?
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id])
+  status        String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime? @updatedAt @map(name: "updated_at")
+  addresses     Address[]
+}
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id])
+  status      String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  price       Int
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
+  companyId   String
+  company     Company         @relation(fields: [companyId], references: [id])
+  unit        Int
+  status      String          @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at  DateTime        @default(now())
+  updated_at  DateTime?       @updatedAt
+  prirces     ProductPrice[]
+}
+
+model ProductImage {
+  id         String    @id @default(cuid())
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id])
+  url        String
+  status     String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+}
+
+model ProductPrice {
+  id         String    @id @default(cuid())
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id])
+  currency   String
+  amount     Float
+  status     String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
 }

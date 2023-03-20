@@ -16,16 +16,22 @@ const Header: React.FC = () => {
     <Stack
       direction="row"
       alignItems="center"
-      justifyContent="space-between"
+      justifyContent="flex-end"
       sx={(theme) => ({
-        height: "65px",
+        // height: "65px",
         borderBottom: "1px solid",
         padding: "8px 32px",
         borderColor: colors.grey30,
       })}
     >
-      <Typography variant="headline2">{"hello"}</Typography>
-      <Avatar>111</Avatar>
+      <Avatar
+        sx={{
+          width: "24px",
+          height: "24px",
+        }}
+      >
+        {session?.user?.email[0]}
+      </Avatar>
     </Stack>
   );
 };

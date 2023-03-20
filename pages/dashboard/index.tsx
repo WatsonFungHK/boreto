@@ -7,7 +7,8 @@ const DashboardPage = () => {
       <h1>Dashboard</h1>
       {/* <p>Welcome back, {user?.email}!</p> */}
       <p>{status}</p>
-      <p>{JSON.stringify(user)}</p>
+
+      {user && <p>{JSON.stringify(user)}</p>}
     </>
   );
 };

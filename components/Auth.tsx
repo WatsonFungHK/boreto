@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 function Auth({ children }) {
   const router = useRouter();
-  const { status } = useSession({ required: true });
+  const { status, data: user } = useSession();
 
   if (status === "loading") {
     return <div>Loading...</div>;

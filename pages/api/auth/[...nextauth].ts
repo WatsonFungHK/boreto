@@ -9,6 +9,7 @@ import EmailProvider from "next-auth/providers/email"
 import prisma from '../../../lib/prisma';
 import { compare } from 'bcrypt';
 import { User } from '@prisma/client'
+import jwt from 'jsonwebtoken';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -43,6 +44,10 @@ export const authOptions: NextAuthOptions = {
         if (!user || !(await compare(password, user?.password))) {
           throw new Error("Invalid email or password");
         }
+
+        const accessToken = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
+        user.accessToken = accessToken;
+
         return user;
       },
     }),
@@ -57,16 +62,28 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user, profile, isNewUser }) {
+      console.log('isNewUser: ', isNewUser);
+      console.log('profile: ', profile);
+      console.log('user: ', user);
+      console.log('account: ', account);
       // Persist the OAuth access_token to the token right after signin
-      if (account) {
-        token.accessToken = account.access_token
+      if (user) {
+        token.accessToken = user.accessToken
+        token.companyId = user.companyId
       }
       return token
     },
     async session({ session, token, user }) {
+      console.log('session: ', session);
+      console.log('token: ', token);
       // Send properties to the client, like an access_token from a provider.
-      // session.accessToken = token.accessToken
+      session.accessToken = token.accessToken
+      session.user = {
+        ...session.user,
+        companyId: token.companyId
+
+      }
       return session
     }
   },

@@ -1,5 +1,7 @@
+import Form from "./Form";
+
 const Customer = () => {
-  return <div>{"view customer"}</div>;
+  return <Form />;
 };
 
 export default Customer;

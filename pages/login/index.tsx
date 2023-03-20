@@ -65,11 +65,12 @@ const LoginForm = ({ csrfToken }) => {
       });
 
       if (response.ok) {
-        router.push("/dashboard");
+        router.push("/company/office/new");
         toast.success("Login successfully");
       }
     } catch (error) {
-      toast.error(error.response.data.error || "Login failed");
+      console.log("error: ", error);
+      toast.error(error?.response?.data?.error || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -84,6 +85,7 @@ const LoginForm = ({ csrfToken }) => {
       justifyContent="center"
       alignItems="center"
       style={{ minHeight: "100vh" }}
+      spacing={2}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
