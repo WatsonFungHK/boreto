@@ -5,7 +5,7 @@ export const columns= [
   },
   { label: "description", accessor: "description" },
   {
-    label: "product_count",
-    accessor: "_count.products",
+    label: "staff_count",
+    accessor: "_count.users",
   },
 ];

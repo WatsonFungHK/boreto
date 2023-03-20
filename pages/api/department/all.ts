@@ -44,9 +44,13 @@ export default async function handler(
           skip,
           take
         }),
-        // include: {
-        //   users: true,
-        // }
+        include: {
+          _count: {
+            select: {
+              users: true
+            }
+          }
+        }
       }),
     ])
     res.status(200).json({ total, items });

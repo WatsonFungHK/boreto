@@ -62,14 +62,13 @@ export default async function handler(
         where: {
           id: req.query.id,
         },
-        // include: {
-        //   addresses: {
-        //     where: {
-        //       status: 'A'
-        //     }
-        //   },
-          
-        // }
+        include: {
+          addresses: {
+            where: {
+              status: 'A'
+            }
+          }
+        }
       });
       
       res.status(200).json(response);
