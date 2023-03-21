@@ -72,7 +72,7 @@ const ProductCategoryForm = ({}: {}) => {
   const { status } = watch();
 
   useEffect(() => {
-    if (id) {
+    if (!isNew) {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
@@ -89,7 +89,7 @@ const ProductCategoryForm = ({}: {}) => {
 
       fetchItem();
     }
-  }, [id]);
+  }, [isNew]);
 
   const onSubmit = async (data: FormData) => {
     try {

@@ -1,9 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma';
-import { companyId } from '../constants'
 
-const filterFields = ['name']
+const filterFields = ['name', 'description']
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +19,6 @@ export default async function handler(
       }
     });
     const whereClause = {
-      companyId,
       NOT: {
         status: 'D'
       },
@@ -33,30 +31,22 @@ export default async function handler(
     const take = _pageSize;
 
     const [total, items] = await prisma.$transaction([
-      prisma.office.count({
+      prisma.permission.count({
         where: whereClause
       }),
-      prisma.office.findMany({
-        orderBy: {
-          updated_at: 'desc'
-        },
-        where: whereClause,
+      prisma.permission.findMany({
         ...(pageNumber && pageSize && {
           skip,
           take
         }),
-        include: {
-          _count: {
-            select: {
-              users: true
-            }
-          }
-        }
+        orderBy: {
+          updated_at: 'desc'
+        },
+        where: whereClause,
       }),
     ])
     res.status(200).json({ total, items });
   } catch (error) {
-    console.log('error: ', error);
     res.status(500).json({ error: error.message })
   }
 }

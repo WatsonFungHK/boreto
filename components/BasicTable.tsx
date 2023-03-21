@@ -15,6 +15,7 @@ import { Stack, Typography } from "@mui/material";
 export interface Column {
   label: string;
   accessor: string;
+  format?: () => string;
 }
 
 const createArrayFromNumber = (num) => {
@@ -56,9 +57,10 @@ export default function BasicTable({
         }}
         onClick={defaultOnClick(row)}
       >
-        {columns.map(({ accessor }) => (
-          <TableCell key={accessor}>{_.get(row, accessor)}</TableCell>
-        ))}
+        {columns.map(({ accessor, format = (value) => value }) => {
+          let value = _.get(row, accessor);
+          return <TableCell key={accessor}>{format(value)}</TableCell>;
+        })}
       </TableRow>
     ));
   };

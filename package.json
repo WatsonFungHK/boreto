@@ -2,9 +2,6 @@
   "name": "hello-next",
   "version": "1.0.0",
   "description": "",
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
-  },
   "scripts": {
     "dev": "next",
     "build": "next build",

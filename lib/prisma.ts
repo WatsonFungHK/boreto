@@ -11,4 +11,10 @@ if (process.env.NODE_ENV === 'production') {
   prisma = global.prisma;
 }
 
+prisma.$use(async (params, next) => {
+  // Your middleware logic goes here
+
+  return next(params);
+});
+
 export default prisma;

@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma';
+import { companyId } from '../constants'
 
 const filterFields = ['first_name', 'last_name', 'email', 'phone_number']
 
@@ -19,6 +20,7 @@ export default async function handler(
       }
     });
     const whereClause = {
+      companyId,
       NOT: {
         status: 'D'
       },

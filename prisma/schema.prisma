@@ -23,6 +23,7 @@ model User {
   departmentId String?
   officeId     String?
   office       Office?     @relation(fields: [officeId], references: [id])
+  UserRole     UserRole[]
 
   @@map(name: "users")
 }
@@ -96,6 +97,7 @@ model Company {
   Product                      Product[]
   Department                   Department[]
   Office                       Office[]
+  Role                         Role[]
 }
 
 model Account {
@@ -203,4 +205,48 @@ model ProductPrice {
   status     String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  permissions RolePermission[]
+  users       UserRole[]
+  companyId   String
+  company     Company          @relation(fields: [companyId], references: [id])
+  created_at  DateTime         @default(now())
+  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  updated_at  DateTime?        @updatedAt
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  roles       RolePermission[]
+  created_at  DateTime         @default(now())
+  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  updated_at  DateTime?        @updatedAt
+}
+
+model UserRole {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  created_at DateTime @default(now())
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  created_at   DateTime   @default(now())
+
+  @@id([roleId, permissionId])
 }

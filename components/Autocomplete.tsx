@@ -1,9 +1,15 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { Autocomplete, TextField, Stack, Typography } from "@mui/material";
+import {
+  Autocomplete as Auto,
+  TextField,
+  Stack,
+  Typography,
+} from "@mui/material";
 
-const _Autocomplete = ({ options, name, subtitle = "" }) => {
+const Autocomplete = ({ options = [], name, subtitle = "" }) => {
   const { control, watch } = useFormContext();
   const value = watch(name);
+
   return (
     <Stack spacing={1}>
       <Typography>{subtitle}</Typography>
@@ -12,7 +18,7 @@ const _Autocomplete = ({ options, name, subtitle = "" }) => {
         name={name}
         render={({ field: { onChange, ...restProps } }) => {
           return (
-            <Autocomplete
+            <Auto
               {...restProps}
               multiple
               options={options}
@@ -40,4 +46,4 @@ const _Autocomplete = ({ options, name, subtitle = "" }) => {
   );
 };
 
-export default _Autocomplete;
+export default Autocomplete;

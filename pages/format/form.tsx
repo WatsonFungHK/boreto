@@ -3,21 +3,17 @@
 // always skip id, created_at, updated_at, companyId
 /**
  * 
-model Product {
-  id          String          @id @default(cuid())
+model Role {
+  id          String           @id @default(cuid())
   name        String
   description String?
-  price       Int
-  categoryId  String
-  category    ProductCategory @relation(fields: [categoryId], references: [id])
-  images      ProductImage[]
+  permissions RolePermission[]
+  users       UserRole[]
+  company     Company          @relation(fields: [companyId], references: [id])
+  created_at  DateTime         @default(now())
+  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  updated_at  DateTime?        @updatedAt
   companyId   String
-  company     Company         @relation(fields: [companyId], references: [id])
-  unit        Int
-  status      String          @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
-  created_at  DateTime        @default(now())
-  updated_at  DateTime?       @updatedAt
-  prirces     ProductPrice[]
 }
  */
 
@@ -46,6 +42,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { string, object, date, number } from "yup";
+import { useItems, getItem, upsertItem } from "lib/swr";
 
 const defaultValues = {
   first_name: "",
@@ -72,16 +69,6 @@ const GENDERS = [
   { value: "U", label: "unspecified" },
 ];
 
-const getItem = async (id: string) => {
-  const response = await axiosClient.get(`/api/customer/${id}`);
-  return response.data;
-};
-
-const upsertItem = async (id: string, item: FormData) => {
-  const response = await axiosClient.post(`/api/customer/${id}`, item);
-  return response.data;
-};
-
 const CustomerForm = ({}: {}) => {
   const router = useRouter();
 
@@ -104,11 +91,11 @@ const CustomerForm = ({}: {}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (id) {
+    if (!isNew) {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
-          const item = await getItem(id as string);
+          const item = await getItem(`/api/customer/${id}`);
           if (item) {
             reset(item);
           }
@@ -121,12 +108,12 @@ const CustomerForm = ({}: {}) => {
 
       fetchItem();
     }
-  }, [id]);
+  }, [isNew]);
 
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(id as string, data);
+      const response = await upsertItem(`/api/customer/${id}`, data);
       router.push("/customer");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {

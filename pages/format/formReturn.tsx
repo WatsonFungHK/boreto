@@ -2,17 +2,19 @@
  * this is a follow up of the last message
  * remember the schema I just sent to you in the last message?
  * let me remind you:
-model Office {
-  id          String    @id @default(cuid())
+model Role {
+  id          String           @id @default(cuid())
   name        String
   description String?
+  permissions RolePermission[]
+  users       UserRole[]
   companyId   String
-  company     Company   @relation(fields: [companyId], references: [id])
-  type        String    @default("O") // 'O' = Office, 'W' = Warehouse
-  status      String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
-  created_at  DateTime  @default(now())
-  updated_at  DateTime?
+  company     Company          @relation(fields: [companyId], references: [id])
+  created_at  DateTime         @default(now())
+  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  updated_at  DateTime?        @updatedAt
 }
+
  */
 /**
  * generate the code based on how I wrote the schema and example
@@ -76,6 +78,7 @@ model Office {
           <Stack spacing={1}>
             <Typography>{t("gender")}</Typography>
             <FormControl fullWidth error={!!errors.gender}>
+              // use controller for select !!!
               <Controller
                 control={methods.control}
                 name="gender"

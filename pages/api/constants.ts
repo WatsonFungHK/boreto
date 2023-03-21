@@ -1,1 +1,1 @@
-export const companyId = 'clfet3e9f000008jzgmo22opr';
+export const companyId = 'clfgy82vx000108jy4zt5btxw';
