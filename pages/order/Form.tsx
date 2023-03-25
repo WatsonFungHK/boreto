@@ -10,6 +10,7 @@ import {
   FormControl,
   Typography,
   Grid,
+  IconButton,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
@@ -18,10 +19,14 @@ import { toast } from "react-toastify";
 import { string, object, date, number, array, boolean } from "yup";
 import { getDateString } from "utils/date";
 import AddressForm, { addressSchema } from "components/AddressForm";
-import OrderItemForm, { orderItemSchema, generateProductOptions } from "components/OrderItemForm";
+import OrderItemForm, {
+  orderItemSchema,
+  generateProductOptions,
+} from "components/OrderItemForm";
 import Autocomplete from "components/Autocomplete";
 import { useItems, getItem, upsertItem } from "lib/swr";
 import useDynamicOptions from "hooks/useDynamicOptions";
+import { Visibility } from "@mui/icons-material";
 
 export const schema = object().shape({
   isNew: boolean(),
@@ -33,6 +38,11 @@ export const schema = object().shape({
   customerId: string().required("required"),
   orderItems: array().of(
     object({
+      productId: string().when("isNew", {
+        is: false,
+        then: string().required("required"),
+        otherwise: string().nullable(),
+      }),
       product: object({
         value: string().required("required"),
         label: string().required("required"),
@@ -59,9 +69,10 @@ const generateCustomerOptions = (customers: any[]) => {
 };
 
 const generateOrderItems = (orderItems: any[]) => {
-  return orderItems.map(({ id, name, quantity, price }) => {
+  return orderItems.map(({ id, name, quantity, price, productId }) => {
     const products = generateProductOptions([{ id, name, price }]);
     return {
+      productId,
       product: products[0],
       quantity,
       price,
@@ -176,7 +187,22 @@ const OrderForm = ({}: {}) => {
                     </Select>
                   </FormControl>
                 )}
-                {!isNew && <TextField {...register("customerName")} readOnly />}
+                {!isNew && (
+                  <Stack direction={"row"} spacing={1}>
+                    <TextField
+                      {...register("customerName")}
+                      sx={{
+                        flexGrow: 1,
+                      }}
+                      disabled
+                    />
+                    <IconButton
+                      onClick={() => router.push(`/customer/${customerId}`)}
+                    >
+                      <Visibility />
+                    </IconButton>
+                  </Stack>
+                )}
               </Stack>
             </Grid>
           </Grid>

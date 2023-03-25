@@ -73,7 +73,6 @@ const ProductForm = ({}: {}) => {
     isLoading: isLoadingSuppliers,
     data: { items: suppliers } = { items: [] },
   } = useSWR("/api/supplier/all", fetcher);
-  console.log("suppliers: ", suppliers);
 
   const { t } = useTranslation("common", { keyPrefix: "product" });
   const methods = useForm<FormData>({
@@ -94,6 +93,8 @@ const ProductForm = ({}: {}) => {
         try {
           setIsLoading(true);
           const item = await getItem(id as string);
+          console.log("id: ", id);
+          console.log("use item: ", item);
           if (item) {
             reset(item);
           }

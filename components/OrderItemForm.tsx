@@ -30,6 +30,8 @@ import cuid from "cuid";
 import { string, object, date, number, array } from "yup";
 import { ContentCopy } from "@mui/icons-material";
 import useProductOptions from "hooks/useProductOptions";
+import { useRouter } from "next/router";
+import { Visibility } from "@mui/icons-material";
 
 const orderItemTypes = [
   { value: "P", label: "Phone" },
@@ -65,6 +67,7 @@ const OrderItemForm = ({
   defaultExpanded,
 }) => {
   const { t } = useTranslation();
+  const router = useRouter();
   const {
     control,
     register,
@@ -168,36 +171,51 @@ const OrderItemForm = ({
                         <Controller
                           control={control}
                           name="product"
-                          render={() => (
-                            <Select
-                              value={item.product}
-                              onChange={(e) => {
-                                setValue(
-                                  `${fieldName}.product`,
-                                  e.target.value
-                                );
-                                setValue(
-                                  `${fieldName}.price`,
-                                  e.target.value.price
-                                );
-                              }}
-                              disabled={readOnly}
-                            >
-                              {!readOnly &&
-                                productOptions.map((option) => {
+                          render={() =>
+                            readOnly ? (
+                              <Stack direction={"row"} spacing={1}>
+                                <TextField
+                                  value={item.product?.label}
+                                  sx={{
+                                    flexGrow: 1,
+                                  }}
+                                  disabled
+                                />
+                                <IconButton
+                                  onClick={() =>
+                                    router.push(
+                                      `/product/product/${item.productId}`
+                                    )
+                                  }
+                                >
+                                  <Visibility />
+                                </IconButton>
+                              </Stack>
+                            ) : (
+                              <Select
+                                value={item.product}
+                                onChange={(e) => {
+                                  setValue(
+                                    `${fieldName}.product`,
+                                    e.target.value
+                                  );
+                                  setValue(
+                                    `${fieldName}.price`,
+                                    e.target.value.price
+                                  );
+                                }}
+                                disabled={readOnly}
+                              >
+                                {productOptions.map((option) => {
                                   return (
                                     <MenuItem value={option} key={option.value}>
                                       {option.label}
                                     </MenuItem>
                                   );
                                 })}
-                              {readOnly && (
-                                <MenuItem value={item.product}>
-                                  {item.product?.label}
-                                </MenuItem>
-                              )}
-                            </Select>
-                          )}
+                              </Select>
+                            )
+                          }
                         />
                         {errors.product && (
                           <FormHelperText>
