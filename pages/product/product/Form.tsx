@@ -68,7 +68,6 @@ const ProductForm = ({}: {}) => {
     isLoading: isLoadingCategories,
     data: { items: productCategories } = { items: [] },
   } = useSWR("/api/product-category/all", fetcher);
-  console.log("productCategories: ", productCategories);
   const {
     isLoading: isLoadingSuppliers,
     data: { items: suppliers } = { items: [] },
@@ -93,8 +92,6 @@ const ProductForm = ({}: {}) => {
         try {
           setIsLoading(true);
           const item = await getItem(id as string);
-          console.log("id: ", id);
-          console.log("use item: ", item);
           if (item) {
             reset(item);
           }

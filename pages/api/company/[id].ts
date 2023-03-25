@@ -24,7 +24,7 @@ export default async function handler(
       const id = req.body.id || cuid();
       const { updated_at, created_at, ...data } = req.body;
       const createBody = {...data, id, companyId, };
-      console.log('createBody: ', createBody);
+
       const response = await prisma.product.upsert({
         where: {
           id,

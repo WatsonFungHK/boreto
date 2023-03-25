@@ -39,7 +39,6 @@ export const schema = object().shape({
 export type FormData = ReturnType<typeof schema["cast"]>;
 
 const generateUserOptions = (users = []) => {
-  console.log("users: ", users);
   if (users.length === 0) {
     return [];
   }

@@ -119,7 +119,6 @@ const OrderForm = ({}: {}) => {
           const item = await getItem(`/api/order/${id}` as string);
           if (item) {
             const orderItems = generateOrderItems(item.orderItems);
-            console.log("orderItems: ", orderItems);
             reset({
               isNew,
               ...item,

@@ -11,7 +11,6 @@ export const columns: Array<Column> = [
     label: "permissions",
     accessor: "permissions",
     format: (value) => {
-      console.log('value: ', value);
       return value.map((v) => v.permission.name).join(', ') as string;
     }
   },

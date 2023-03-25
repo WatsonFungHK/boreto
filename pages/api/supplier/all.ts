@@ -30,9 +30,7 @@ export default async function handler(
     const _pageNumber = parseInt(pageNumber as string, 10) || 1;
     const _pageSize = parseInt(pageSize as string, 10) || 10;
     const skip = (_pageNumber - 1) *_pageSize;
-    console.log('skip: ', skip);
     const take = _pageSize;
-    console.log('take: ', take);
 
     const [total, items] = await prisma.$transaction([
       prisma.supplier.count({

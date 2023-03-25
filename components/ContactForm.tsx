@@ -44,7 +44,6 @@ export const contactSchema = array().of(
     value: string()
       .required()
       .test("value", "Invalid contact value", function (value) {
-        console.log("value: ", value);
         const { type } = this.parent;
 
         if (type === "E") {

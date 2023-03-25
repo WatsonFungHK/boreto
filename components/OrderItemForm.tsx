@@ -83,7 +83,6 @@ const OrderItemForm = ({
 
   const formatSummary = (index) => {
     const _orderItem = getValues(`orderItems.${index}`);
-    console.log("_orderItem: ", _orderItem);
     if (_orderItem.product?.label) {
       return (
         <>
@@ -129,7 +128,6 @@ const OrderItemForm = ({
       {orderItems.fields.map((orderItem, index) => {
         const fieldName = `orderItems.${index}`;
         const item = getValues(`${fieldName}`);
-        console.log("item: ", item);
 
         const errors = _errors?.orderItems?.[index] || {};
         return (

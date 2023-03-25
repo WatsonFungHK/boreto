@@ -26,8 +26,12 @@ const columns: Array<Column> = [
     accessor: "totalAmount",
   },
   {
-    label: "order_item_count",
-    accessor: "_count.orderItems",
+    label: "order_items",
+    accessor: "orderItems",
+    format: (value: any, row) => {
+      const names = value.map((v: any) => v.name);
+      return names.join(", ");
+    },
   },
   {
     label: "delivery_status",
