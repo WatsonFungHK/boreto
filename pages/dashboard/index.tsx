@@ -1,17 +1,9 @@
 import { useSession } from "next-auth/react";
-
+import Overview from "./overview";
 const DashboardPage = () => {
   // const { data: user, status } = useSession();
   const status = "test";
-  return (
-    <>
-      <h1>Dashboard</h1>
-      {/* <p>Welcome back, {user?.email}!</p> */}
-      <p>{status}</p>
-
-      {/* {user && <p>{JSON.stringify(user)}</p>} */}
-    </>
-  );
+  return <Overview />;
 };
 
 export default DashboardPage;

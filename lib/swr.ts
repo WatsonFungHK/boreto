@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import axiosClient from './axiosClient';
 
-const fetcher = async ({ url, query }) => {
+export const fetcher = async ({ url, query }) => {
   const queryParams = new URLSearchParams(query).toString();
   const response = await axiosClient.get(url + "?" + queryParams);
   return response.data;
