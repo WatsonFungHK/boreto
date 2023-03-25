@@ -57,9 +57,21 @@ export default function BasicTable({
         }}
         onClick={defaultOnClick(row)}
       >
-        {columns.map(({ accessor, format = (value) => value }) => {
+        {columns.map(({ accessor, format = (value, row) => value }) => {
           let value = _.get(row, accessor);
-          return <TableCell key={accessor}>{format(value)}</TableCell>;
+          return (
+            <TableCell
+              key={accessor}
+              sx={{
+                maxWidth: "150px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {format(value, row)}
+            </TableCell>
+          );
         })}
       </TableRow>
     ));
@@ -97,7 +109,17 @@ export default function BasicTable({
         <TableHead>
           <TableRow>
             {columns.map(({ label, accessor }) => (
-              <TableCell key={accessor}>{t(label)}</TableCell>
+              <TableCell
+                key={accessor}
+                sx={{
+                  // make it ellsipis
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t(label)}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>

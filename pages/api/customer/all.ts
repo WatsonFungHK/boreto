@@ -10,7 +10,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { keyword, pageNumber, pageSize } = req.query;
+    const { keyword = '', pageNumber, pageSize } = req.query;
     const filterConditions = filterFields.map((field) => {
       return {
         [field]: {

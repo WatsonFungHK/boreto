@@ -24,7 +24,8 @@ const defaultValues = {
   description: "",
   unit: 0,
   price: 0,
-  categoryId: "",
+  categoryId: undefined,
+  supplierId: undefined,
   status: "A",
 };
 
@@ -39,6 +40,7 @@ export const schema = object().shape({
   unit: number().positive().required("required"),
   price: number().positive().required("required"),
   categoryId: string().optional(),
+  supplierId: string().optional(),
   status: string().required("required"),
 });
 
@@ -62,10 +64,16 @@ const ProductForm = ({}: {}) => {
   } = router;
   const isNew = id === "new";
 
-  const { data: { items: productCategories } = { items: [] } } = useSWR(
-    "/api/product-category/all",
-    fetcher
-  );
+  const {
+    isLoading: isLoadingCategories,
+    data: { items: productCategories } = { items: [] },
+  } = useSWR("/api/product-category/all", fetcher);
+  console.log("productCategories: ", productCategories);
+  const {
+    isLoading: isLoadingSuppliers,
+    data: { items: suppliers } = { items: [] },
+  } = useSWR("/api/supplier/all", fetcher);
+  console.log("suppliers: ", suppliers);
 
   const { t } = useTranslation("common", { keyPrefix: "product" });
   const methods = useForm<FormData>({
@@ -78,7 +86,7 @@ const ProductForm = ({}: {}) => {
     reset,
     formState: { errors },
   } = methods;
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!isNew) {
@@ -113,6 +121,9 @@ const ProductForm = ({}: {}) => {
     }
   };
 
+  if (isLoading || isLoadingCategories || isLoadingSuppliers)
+    return <div>Loading...</div>;
+
   return (
     <Stack spacing={2}>
       <Typography variant="h5">
@@ -133,7 +144,6 @@ const ProductForm = ({}: {}) => {
             <Typography>{t("description")}</Typography>
             <TextField
               multiline
-              rows={4}
               {...register("description")}
               error={!!errors.description}
               helperText={errors.description?.message}
@@ -173,6 +183,24 @@ const ProductForm = ({}: {}) => {
                     {productCategories.map((category) => (
                       <MenuItem value={category.id} key={category.id}>
                         {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </FormControl>
+          </Stack>
+          <Stack spacing={1}>
+            <Typography>{t("supplier")}</Typography>
+            <FormControl fullWidth error={!!errors.supplierId}>
+              <Controller
+                control={methods.control}
+                name="supplierId"
+                render={({ field }) => (
+                  <Select {...field}>
+                    {suppliers.map((item) => (
+                      <MenuItem value={item.id} key={item.id}>
+                        {item.name}
                       </MenuItem>
                     ))}
                   </Select>

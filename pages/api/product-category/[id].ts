@@ -45,9 +45,6 @@ export default async function handler(
           products: {
             set: products.map((id) => ({ id }))
           }
-          // products: {
-          //   set: products.map((id) => ({ id }))
-          // }
         }
       });
         

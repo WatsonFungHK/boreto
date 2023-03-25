@@ -24,6 +24,7 @@
     "bcrypt": "^5.1.0",
     "caniuse-lite": "^1.0.30001467",
     "cuid": "^3.0.0",
+    "dayjs": "^1.11.7",
     "deep-equal": "^2.2.0",
     "eslint": "^8.36.0",
     "eslint-config-next": "^13.2.4",

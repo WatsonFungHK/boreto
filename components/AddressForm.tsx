@@ -17,6 +17,19 @@ import { Delete, ExpandMore } from "@mui/icons-material";
 import deepEqual from "deep-equal";
 import colors from "theme/colors";
 import cuid from "cuid";
+import { array, object, string } from "yup";
+
+export const addressSchema = array().of(
+  object({
+    line_1: string().required(),
+    line_2: string().optional(),
+    line_3: string().optional(),
+    city: string().required(),
+    state: string().required(),
+    postal_code: string().optional(),
+    country: string().required(),
+  })
+);
 
 const AddressForm = ({ multiple = true }) => {
   const { t } = useTranslation();
@@ -33,7 +46,7 @@ const AddressForm = ({ multiple = true }) => {
   return (
     <Stack spacing={2}>
       <Stack justifyContent={"space-between"} direction="row">
-        <Typography variant="h5">{t(`addresses`)}</Typography>
+        <Typography variant="h6">{t(`addresses`)}</Typography>
         {multiple && (
           <Button
             startIcon={<AddIcon />}

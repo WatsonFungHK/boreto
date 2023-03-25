@@ -15,4 +15,8 @@ export const columns: Array<Column> = [
     label: "category",
     accessor: "category.name",
   },
+  {
+    label: "supplier",
+    accessor: "supplier.name",
+  },
 ];

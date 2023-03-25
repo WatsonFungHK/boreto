@@ -14,7 +14,7 @@ export default async function handler(
       const response = await prisma.product.findUnique({
         where: {
           id: req.query.id,
-        }
+        },
       });
       
       res.status(200).json(response);

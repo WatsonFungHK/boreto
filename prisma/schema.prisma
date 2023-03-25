@@ -62,6 +62,8 @@ model Address {
   customerId  String?
   officeId    String?
   office      Office?   @relation(fields: [officeId], references: [id])
+  supplier    Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId  String?
 }
 
 model Office {
@@ -98,6 +100,8 @@ model Company {
   Department                   Department[]
   Office                       Office[]
   Role                         Role[]
+  Supplier                     Supplier[]
+  Order                        Order[]
 }
 
 model Account {
@@ -155,6 +159,7 @@ model Customer {
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime? @updatedAt @map(name: "updated_at")
   addresses     Address[]
+  Order         Order[]
 }
 
 model ProductCategory {
@@ -184,6 +189,9 @@ model Product {
   created_at  DateTime         @default(now())
   updated_at  DateTime?        @updatedAt
   prices      ProductPrice[]
+  supplier    Supplier?        @relation(fields: [supplierId], references: [id])
+  supplierId  String?
+  OrderItem   OrderItem[]
 }
 
 model ProductImage {
@@ -249,4 +257,79 @@ model RolePermission {
   created_at   DateTime   @default(now())
 
   @@id([roleId, permissionId])
+}
+
+model Contact {
+  id         String    @id @default(cuid())
+  value      String
+  type       String // 'E' = Email, 'P' = Phone, 'F' = Fax,
+  remark     String?
+  status     String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  Supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId String?
+}
+
+model Supplier {
+  id         String    @id @default(cuid())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  status     String    @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  addresses  Address[]
+  companyId  String
+  company    Company   @relation(fields: [companyId], references: [id])
+  products   Product[]
+  contacts   Contact[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  customerId  String
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
+  status      String      @default("A")
+  orderItems  OrderItem[]
+  Shipping    Shipping[]
+  company     Company     @relation(fields: [companyId], references: [id])
+  companyId   String
+  totalAmount Float?
+}
+
+// all are snapshot of product at the time of order
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String  @default("")
+  quantity  Int
+  price     Float
+  subtotal  Float
+}
+
+enum ShippingStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED_DELIVERY
+  RETURNED
+  CANCELLED
+}
+
+model Shipping {
+  id        String         @id @default(cuid())
+  orderId   String
+  order     Order          @relation(fields: [orderId], references: [id])
+  method    String
+  cost      Float
+  address   String
+  status    ShippingStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime?      @updatedAt
 }

@@ -31,5 +31,5 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "bak.ts"  ]
+, "bak.ts", "hooks/useProductOptions.ts", "hooks/useDynamicOptions.ts"  ]
 }

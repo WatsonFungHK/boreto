@@ -148,6 +148,7 @@ const ProductCategoryForm = ({}: {}) => {
           <Stack spacing={1}>
             <Typography>Description</Typography>
             <TextField
+              multiline
               {...register("description")}
               error={!!errors.description}
               helperText={errors.description?.message}

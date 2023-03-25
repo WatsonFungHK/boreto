@@ -148,6 +148,7 @@ const RoleForm = ({}: {}) => {
           <Stack spacing={1}>
             <Typography>{t("description")}</Typography>
             <TextField
+              multiline
               {...register("description")}
               error={!!errors.description}
               helperText={errors.description?.message}

@@ -96,12 +96,10 @@ const Form = ({}: {}) => {
     data: { items: departments } = { items: [] },
     isLoading: isLoadingDepartments,
   } = useSWR("/api/department/all", fetcher);
-  console.log("departments: ", departments);
   const {
     data: { items: offices } = { items: [] },
     isLoading: isLoadingOffices,
   } = useSWR("/api/office/all", fetcher);
-  console.log("offices: ", offices);
 
   const methods = useForm<FormData>({
     defaultValues,
@@ -266,8 +264,6 @@ const Form = ({}: {}) => {
                     render={({ field }) => (
                       <Select {...field}>
                         {departments.map(({ id, name }) => {
-                          console.log("id: ", id);
-                          console.log("name: ", name);
                           return (
                             <MenuItem value={id} key={id}>
                               {t(name)}
