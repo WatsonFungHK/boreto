@@ -32,16 +32,16 @@ export const schema = object().shape({
   isNew: boolean(),
   customerName: string().when("isNew", {
     is: false,
-    then: string().required("required"),
-    otherwise: string().nullable(),
+    then: (schema) => schema.required("required"),
+    otherwise: (schema) => schema.nullable(),
   }),
   customerId: string().required("required"),
   orderItems: array().of(
     object({
       productId: string().when("isNew", {
         is: false,
-        then: string().required("required"),
-        otherwise: string().nullable(),
+        then: (schema) => schema.required("required"),
+        otherwise: (schema) => schema.nullable(),
       }),
       product: object({
         value: string().required("required"),
@@ -81,6 +81,7 @@ const generateOrderItems = (orderItems: any[]) => {
 };
 
 const OrderForm = ({}: {}) => {
+  console.log("OrderForm rendered");
   const router = useRouter();
   const customerOptions = useDynamicOptions(
     "customer",
@@ -91,6 +92,7 @@ const OrderForm = ({}: {}) => {
     query: { id },
   } = router;
   const isNew = id === "new";
+  console.log("isNew: ", isNew);
 
   const { t } = useTranslation("common", { keyPrefix: "order" });
   const methods = useForm<FormData>({
@@ -106,8 +108,10 @@ const OrderForm = ({}: {}) => {
     watch,
     formState: { errors },
   } = methods;
+  console.log("errors: ", errors);
 
   const { customerId } = watch();
+  console.log("customerId: ", customerId);
 
   const [isLoading, setIsLoading] = useState(false);
 
