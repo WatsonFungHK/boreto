@@ -32,6 +32,28 @@ import { Visibility } from "@mui/icons-material";
 import AddressDisplay, { formatAddress } from "components/AddressDisplay";
 import { ContentCopy } from "@mui/icons-material";
 
+const ShippingStatus = {
+  PENDING: "PENDING",
+  PROCESSING: "PROCESSING",
+  SHIPPED: "SHIPPED",
+  OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
+  DELIVERED: "DELIVERED",
+  FAILED_DELIVERY: "FAILED_DELIVERY",
+  RETURNED: "RETURNED",
+  CANCELLED: "CANCELLED",
+};
+
+const ShippingStatusOptions = [
+  { value: ShippingStatus.PENDING, label: "Pending" },
+  { value: ShippingStatus.PROCESSING, label: "Processing" },
+  { value: ShippingStatus.SHIPPED, label: "Shipped" },
+  { value: ShippingStatus.OUT_FOR_DELIVERY, label: "Out for delivery" },
+  { value: ShippingStatus.DELIVERED, label: "Delivered" },
+  { value: ShippingStatus.FAILED_DELIVERY, label: "Failed delivery" },
+  { value: ShippingStatus.RETURNED, label: "Returned" },
+  { value: ShippingStatus.CANCELLED, label: "Cancelled" },
+];
+
 export const schema = object().shape({
   isNew: boolean(),
   customerName: string().when("isNew", {
@@ -67,6 +89,7 @@ export const schema = object().shape({
       }),
       cost: number().required("required"),
       address: addressSchema,
+      status: string().required("required"),
     })
   ),
 });
@@ -131,17 +154,8 @@ const OrderDetail = ({}: {}) => {
   } = methods;
 
   const { customerId, Shipping } = watch();
-  const { data: addresses, error: customerError } = useItems(
-    `/api/address/customer/${customerId}`
-  );
-  const { data: shippingMethods, error: methodError } = useItems(
-    `/api/shipping-method/all`
-  );
 
-  if (customerError || methodError) {
-    toast.error("Error fetching data");
-  }
-
+  const [isUpdatingShipping, setIsUpdatingShipping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -185,9 +199,28 @@ const OrderDetail = ({}: {}) => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const updateShippingStatus = async (index) => {
+    try {
+      setIsUpdatingShipping(true);
+      const shipping = watch(`Shipping.${index}`);
+      console.log("shipping: ", shipping);
+      const { id, status } = shipping;
+      const payload = {
+        id,
+        status,
+      };
+      await upsertItem(`/api/shipping/${id}`, payload);
+      toast.success("Shipping status updated");
+    } catch (err) {
+      toast.error("Error updating shipping status");
+    } finally {
+      setIsUpdatingShipping(false);
+    }
+  };
+
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <Stack spacing={2}>
@@ -220,7 +253,8 @@ const OrderDetail = ({}: {}) => {
               <Typography variant="h6">{t("shipping")}</Typography>
               <Card>
                 <CardContent>
-                  {Shipping.map(({ id }, index) => {
+                  {Shipping.map(({ id, ...restShip }, index) => {
+                    console.log("restShip: ", restShip);
                     const fieldName =
                       `Shipping.${index}.method` as `Shipping.${number}.method`;
 
@@ -286,6 +320,54 @@ const OrderDetail = ({}: {}) => {
                                 ),
                               }}
                             />
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Stack spacing={1}>
+                            <Typography>{t("status")}</Typography>
+                            <Stack direction={"row"} spacing={2}>
+                              <Controller
+                                name={
+                                  `Shipping.${index}.status` as `Shipping.${number}.status`
+                                }
+                                control={control}
+                                render={({ field: { value } }) => {
+                                  return (
+                                    <Select
+                                      value={value}
+                                      onChange={(e) => {
+                                        setValue(
+                                          `Shipping.${index}.status`,
+                                          e.target.value
+                                        );
+                                        console.log(
+                                          "        e.target.value: ",
+                                          e.target.value
+                                        );
+                                      }}
+                                      fullWidth
+                                    >
+                                      {ShippingStatusOptions.map(
+                                        ({ value, label }) => {
+                                          return (
+                                            <MenuItem key={value} value={value}>
+                                              {label}
+                                            </MenuItem>
+                                          );
+                                        }
+                                      )}
+                                    </Select>
+                                  );
+                                }}
+                              />
+                              <LoadingButton
+                                variant="contained"
+                                loading={isUpdatingShipping}
+                                onClick={() => updateShippingStatus(index)}
+                              >
+                                {t("update")}
+                              </LoadingButton>
+                            </Stack>
                           </Stack>
                         </Grid>
                       </Grid>

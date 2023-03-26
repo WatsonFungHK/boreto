@@ -120,11 +120,13 @@ export default async function handler(
           },
           Shipping: {
             select: {
+              id: true,
               cost: true,
               trackingNumber: true,
               trackingUrl : true,
               trackingProvider : true,
               address: true,
+              status: true,
               method: {
                 select: {
                   name: true,

@@ -35,7 +35,13 @@ const columns: Array<Column> = [
   },
   {
     label: "delivery_status",
-    accessor: "delivery.status",
+    accessor: "Shipping",
+    format: (value: any, row) => {
+      if (Array.isArray(value) && value.length > 0) {
+        return value[value.length - 1].status;
+      }
+      return undefined;
+    },
   },
   {
     label: "customer_name",
@@ -48,7 +54,7 @@ const columns: Array<Column> = [
 const TableContainer = ({ filters = {}, onRowClick }) => {
   const router = useRouter();
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize] = useState(5);
+  const [pageSize] = useState(10); // pageSize
   const [keyword, setKeyword] = useState("");
   const {
     data: { total, items } = { total: 0, items: [] },

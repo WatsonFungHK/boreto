@@ -41,7 +41,7 @@ const columns: Array<Column> = [
 const Customer = () => {
   const router = useRouter();
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize] = useState(5);
+  const [pageSize] = useState(10); // pageSize
   const [keyword, setKeyword] = useState("");
   const {
     data: { total, items } = { total: 0, items: [] },
