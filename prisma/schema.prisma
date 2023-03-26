@@ -64,6 +64,7 @@ model Address {
   office      Office?   @relation(fields: [officeId], references: [id])
   supplier    Supplier? @relation(fields: [supplierId], references: [id])
   supplierId  String?
+  shipping    Shipping? // Add optional one-to-one relationship to Shipping
 }
 
 model Office {
@@ -323,13 +324,34 @@ enum ShippingStatus {
 }
 
 model Shipping {
-  id        String         @id @default(cuid())
-  orderId   String
-  order     Order          @relation(fields: [orderId], references: [id])
-  method    String
-  cost      Float
-  address   String
-  status    ShippingStatus @default(PENDING)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime?      @updatedAt
+  id               String         @id @default(cuid())
+  orderId          String
+  order            Order          @relation(fields: [orderId], references: [id])
+  methodId         String
+  method           ShippingMethod @relation(fields: [methodId], references: [id])
+  cost             Float
+  status           ShippingStatus @default(PENDING)
+  trackingNumber   String?
+  trackingUrl      String?
+  trackingProvider String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime?      @updatedAt
+  address          Address        @relation(fields: [addressId], references: [id])
+  addressId        String
+
+  @@unique([addressId])
+}
+
+model ShippingMethod {
+  id          String    @id @default(cuid())
+  name        String
+  provider    String
+  description String?
+  companyId   String
+  cost        Float?
+  status      String    @default("A")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  Shipping Shipping[]
 }

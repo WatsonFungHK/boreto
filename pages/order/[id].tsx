@@ -1,7 +1,16 @@
-import Form from "./Form";
+import { useRouter } from "next/router";
+import Reivew from "./Review";
+import Create from "./Create";
 
-const FormContainer = () => {
-  return <Form />;
-};
+function OrderPage() {
+  const router = useRouter();
+  const { id } = router.query;
 
-export default FormContainer;
+  if (id === "new") {
+    return <Create />;
+  }
+
+  return <Reivew />;
+}
+
+export default OrderPage;

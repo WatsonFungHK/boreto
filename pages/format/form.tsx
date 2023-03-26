@@ -3,17 +3,19 @@
 // always skip id, created_at, updated_at, companyId
 /**
  * 
-model Role {
-  id          String           @id @default(cuid())
+
+model ShippingMethod {
+  id          String    @id @default(cuid())
   name        String
+  provider    String
   description String?
-  permissions RolePermission[]
-  users       UserRole[]
-  company     Company          @relation(fields: [companyId], references: [id])
-  created_at  DateTime         @default(now())
-  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
-  updated_at  DateTime?        @updatedAt
   companyId   String
+  cost        Float?
+  status      String    @default("A")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  Shipping Shipping[]
 }
  */
 

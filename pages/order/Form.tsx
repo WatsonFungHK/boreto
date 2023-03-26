@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import React, { useEffect, useMemo, useState } from "react";
+import { useForm, FormProvider, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axiosClient from "lib/axiosClient";
 import {
@@ -11,19 +11,18 @@ import {
   Typography,
   Grid,
   IconButton,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import { string, object, date, number, array, boolean } from "yup";
-import { getDateString } from "utils/date";
-import AddressForm, { addressSchema } from "components/AddressForm";
+import { string, object, number, array, boolean } from "yup";
 import OrderItemForm, {
-  orderItemSchema,
   generateProductOptions,
 } from "components/OrderItemForm";
-import Autocomplete from "components/Autocomplete";
+import AddressPicker from "components/AddressPicker";
 import { useItems, getItem, upsertItem } from "lib/swr";
 import useDynamicOptions from "hooks/useDynamicOptions";
 import { Visibility } from "@mui/icons-material";
@@ -52,6 +51,8 @@ export const schema = object().shape({
       price: number().required("required"),
     })
   ),
+  methodId: string().required("required"),
+  addressId: string().required("required"),
 });
 
 const defaultValues = {
@@ -81,7 +82,6 @@ const generateOrderItems = (orderItems: any[]) => {
 };
 
 const OrderForm = ({}: {}) => {
-  console.log("OrderForm rendered");
   const router = useRouter();
   const customerOptions = useDynamicOptions(
     "customer",
@@ -92,7 +92,6 @@ const OrderForm = ({}: {}) => {
     query: { id },
   } = router;
   const isNew = id === "new";
-  console.log("isNew: ", isNew);
 
   const { t } = useTranslation("common", { keyPrefix: "order" });
   const methods = useForm<FormData>({
@@ -106,12 +105,21 @@ const OrderForm = ({}: {}) => {
     reset,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = methods;
-  console.log("errors: ", errors);
 
   const { customerId } = watch();
-  console.log("customerId: ", customerId);
+  const { data: addresses, error: customerError } = useItems(
+    `/api/address/customer/${customerId}`
+  );
+  const { data: shippingMethods, error: methodError } = useItems(
+    `/api/shipping-method/all`
+  );
+
+  if (customerError || methodError) {
+    toast.error("Error fetching data");
+  }
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -148,7 +156,6 @@ const OrderForm = ({}: {}) => {
       const { isNew, ...payload } = data;
       const response = await upsertItem(`/api/order/${id}` as string, {
         ...payload,
-        // products: data.orderItems,
       });
       router.push("/order");
       toast.success(isNew ? t("created-success") : "updated-success");
@@ -209,6 +216,41 @@ const OrderForm = ({}: {}) => {
               </Stack>
             </Grid>
           </Grid>
+          {Array.isArray(addresses) && addresses.length > 0 && (
+            <Card>
+              <CardContent>
+                <Grid container>
+                  <Grid item xs={6}>
+                    <Stack spacing={1}>
+                      <Typography>{t("method")}</Typography>
+                      <Controller
+                        name="methodId"
+                        control={control}
+                        render={({ field }) => {
+                          return (
+                            <Select {...field} fullWidth>
+                              {shippingMethods?.items.map(({ id, name }) => {
+                                return (
+                                  <MenuItem value={id} key={id}>
+                                    {t(name)}
+                                  </MenuItem>
+                                );
+                              })}
+                            </Select>
+                          );
+                        }}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid xs={6} />
+                </Grid>
+                <AddressPicker addresses={addresses} />
+              </CardContent>
+            </Card>
+          )}
+          {!(Array.isArray(addresses) && addresses.length > 0) && (
+            <Typography>{t("no-address-to-create-shipping")}</Typography>
+          )}
           <OrderItemForm readOnly={!isNew} defaultExpanded />
           {isNew && (
             <LoadingButton

@@ -2,17 +2,18 @@
  * this is a follow up of the last message
  * remember the schema I just sent to you in the last message?
  * let me remind you:
-model Role {
-  id          String           @id @default(cuid())
+model ShippingMethod {
+  id          String    @id @default(cuid())
   name        String
+  provider    String
   description String?
-  permissions RolePermission[]
-  users       UserRole[]
   companyId   String
-  company     Company          @relation(fields: [companyId], references: [id])
-  created_at  DateTime         @default(now())
-  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
-  updated_at  DateTime?        @updatedAt
+  cost        Float?
+  status      String    @default("A")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  Shipping Shipping[]
 }
 
  */

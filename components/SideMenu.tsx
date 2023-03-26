@@ -9,6 +9,7 @@ import {
   Room,
   People,
   AssignmentInd,
+  Settings,
 } from "@mui/icons-material";
 import { ListItem, ListItemIcon, ListItemText, Stack } from "@mui/material";
 import { useRouter } from "next/router";
@@ -73,6 +74,16 @@ export const menuItems = [
         label: "role",
         icon: <AssignmentInd />,
         link: "/company/role",
+      },
+      {
+        label: "shipping",
+        icon: <Settings />,
+        link: "/company/shipping-method",
+      },
+      {
+        label: "settings",
+        icon: <Settings />,
+        link: "/company/settings",
       },
     ],
   },

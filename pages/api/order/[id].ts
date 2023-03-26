@@ -117,6 +117,21 @@ export default async function handler(
               first_name: true,
               last_name: true,
             }
+          },
+          Shipping: {
+            select: {
+              cost: true,
+              trackingNumber: true,
+              trackingUrl : true,
+              trackingProvider : true,
+              address: true,
+              method: {
+                select: {
+                  name: true,
+                  provider: true,
+                }
+              }
+            }
           }
         }
       });
@@ -128,7 +143,15 @@ export default async function handler(
       if (req.body.id) {
         await update(req, res)
       } else {
-        const { updated_at, created_at, orderItems, ...data } = req.body;
+        const {
+          updated_at,
+          created_at,
+          orderItems,
+          methodId,
+          addressId,
+          customerId,
+          ...data
+        } = req.body;
         const orderItemData =  orderItems.map((item) => ({
           productId: item.product.value,
           name: item.product.label,
@@ -136,15 +159,62 @@ export default async function handler(
           price: item.price,
           subtotal: item.quantity * item.price,
         }));
+
+        const method = await prisma.shippingMethod.findUnique({
+          where: {
+            id: methodId
+          }
+        });
+        console.log('method: ', method);
+
+        const address = await prisma.address.findUnique({
+          where: {
+            id: addressId
+          },
+          select:{
+            line_1: true,
+            line_2: true,
+            line_3: true,
+            city: true,
+            state: true,
+            country: true,
+            postal_code: true,
+            status: true,
+            type: true,
+          }
+        });
+        console.log('address: ', address);
         const response = await prisma.order.create({
           data: {
             ...data,
-            companyId,
+            company: {
+              connect: {
+                id: companyId
+              }
+            },
+            customer: {
+              connect: {
+                id: customerId
+              }
+            },
             // sum subtotal of orderItems
             totalAmount: orderItemData.reduce((acc, item) => acc + item.subtotal, 0),
             orderItems: {
               create: orderItemData
             },
+            Shipping: {
+              create: {
+                method: {
+                  connect: {
+                    id: methodId
+                  }
+                },
+                cost: method.cost,
+                address: {
+                  create: address
+                }
+              }
+            }
           }
         })
         res.status(200).json(response);

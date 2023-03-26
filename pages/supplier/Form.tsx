@@ -26,7 +26,7 @@ export const schema = object().shape({
   name: string().required("required"),
   contacts: contactSchema,
   products: array().of(object({ value: string(), label: string() })),
-  addresses: addressSchema,
+  addresses: array().of(addressSchema),
 });
 
 const defaultValues = {

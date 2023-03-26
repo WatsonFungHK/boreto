@@ -34,17 +34,23 @@ export default function BasicTable({
   columns,
   pageSize,
   isLoading,
+  onRowClick,
 }: {
   rows: Array<any>;
   columns: Array<Column>;
   pageSize: number;
   isLoading: boolean;
+  onRowClick?: Function;
 }) {
   const router = useRouter();
   const { t } = useTranslation();
 
   const defaultOnClick = (row) => () => {
-    router.push(`${router.pathname}/${row.id}`);
+    if (typeof onRowClick === "function") {
+      onRowClick(row);
+    } else {
+      router.push(`${router.pathname}/${row.id}`);
+    }
   };
 
   const renderRows = () => {

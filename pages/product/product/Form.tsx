@@ -84,7 +84,7 @@ const ProductForm = ({}: {}) => {
     reset,
     formState: { errors },
   } = methods;
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!isNew) {
@@ -119,6 +119,9 @@ const ProductForm = ({}: {}) => {
     }
   };
 
+  console.log("isLoading: ", isLoading);
+  console.log("isLoadingCategories: ", isLoadingCategories);
+  console.log("isLoadingSuppliers: ", isLoadingSuppliers);
   if (isLoading || isLoadingCategories || isLoadingSuppliers)
     return <div>Loading...</div>;
 

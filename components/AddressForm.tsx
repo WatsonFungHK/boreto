@@ -19,17 +19,17 @@ import colors from "theme/colors";
 import cuid from "cuid";
 import { array, object, string } from "yup";
 
-export const addressSchema = array().of(
-  object({
-    line_1: string().required(),
-    line_2: string().optional(),
-    line_3: string().optional(),
-    city: string().required(),
-    state: string().required(),
-    postal_code: string().optional(),
-    country: string().required(),
-  })
-);
+export const addressSchema = object({
+  line_1: string().required(),
+  line_2: string().optional(),
+  line_3: string().optional(),
+  city: string().required(),
+  state: string().optional(),
+  postal_code: string().optional(),
+  country: string().required(),
+});
+
+export type addressScehma = ReturnType<typeof addressSchema["cast"]>;
 
 const AddressForm = ({ multiple = true }) => {
   const { t } = useTranslation();

@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { string, object, date, number, array } from "yup";
 import { getDateString } from "utils/date";
-import AddressForm from "components/AddressForm";
+import AddressForm, { addressSchema } from "components/AddressForm";
 
 export const schema = object().shape({
   first_name: string().required("required"),
@@ -29,17 +29,7 @@ export const schema = object().shape({
   credit_amount: number().min(0).optional(),
   birth_date: string().optional().nullable(),
   joined_date: string().optional().nullable(),
-  addresses: array().of(
-    object({
-      line_1: string().required(),
-      line_2: string().optional(),
-      line_3: string().optional(),
-      city: string().required(),
-      state: string().required(),
-      postal_code: string().optional(),
-      country: string().required(),
-    })
-  ),
+  addresses: array().of(addressSchema),
 });
 
 const defaultValues = {
@@ -75,7 +65,7 @@ const upsertItem = async (id: string, item: FormData) => {
   return response.data;
 };
 
-const CustomerForm = ({}: {}) => {
+const CustomerForm = ({ setCustomer }: { setCustomer: Function }) => {
   const router = useRouter();
 
   const {
@@ -112,6 +102,8 @@ const CustomerForm = ({}: {}) => {
               birth_date: getDateString(item.birth_date),
               joined_date: getDateString(item.joined_date),
             });
+
+            setCustomer(item);
           }
         } catch (err) {
           toast.error("Error fetching customer");
@@ -124,10 +116,11 @@ const CustomerForm = ({}: {}) => {
     }
   }, [isNew]);
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(id as string, data);
+      const { _count, ...payload } = data;
+      const response = await upsertItem(id as string, payload);
       router.push("/customer");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {

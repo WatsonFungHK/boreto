@@ -1,7 +1,52 @@
+import { Tabs, Tab, Stack, Avatar, Typography } from "@mui/material";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import Form from "./Form";
+import OrderHistory from "./_orderHistory";
+import colors from "theme/colors";
 
 const Customer = () => {
-  return <Form />;
+  const { query } = useRouter();
+  const { id } = query;
+  const [value, setValue] = useState(0);
+  const [customer, setCustomer] = useState({});
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  return (
+    <Stack gap={2}>
+      {id !== "new" && (
+        <Tabs value={value} onChange={handleChange}>
+          <Tab label="Edit" />
+          <Tab
+            label={
+              <Stack direction={"row"} gap={1} alignItems="center">
+                <Typography>Order History</Typography>
+                <Stack
+                  sx={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "5px",
+                    color: colors.white,
+                    fontSize: "12px",
+                    backgroundColor: colors.darkBlue70,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {customer?._count?.Order || 0}
+                </Stack>
+              </Stack>
+            }
+          />
+        </Tabs>
+      )}
+      {value === 0 && <Form setCustomer={setCustomer} />}
+      {value === 1 && <OrderHistory filters={{ customerId: id }} />}
+    </Stack>
+  );
 };
 
 export default Customer;

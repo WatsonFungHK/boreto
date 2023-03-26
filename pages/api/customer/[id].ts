@@ -68,7 +68,11 @@ export default async function handler(
               status: 'A'
             }
           },
-          
+          _count: {
+            select: {
+              Order: true
+            }
+          }
         }
       });
       

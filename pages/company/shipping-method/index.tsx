@@ -7,7 +7,7 @@ import BasicTable from "components/BasicTable";
 import type { Column } from "components/BasicTable";
 import { useState } from "react";
 import DebouncedInput from "components/DebouncedInput";
-import dayjs from "dayjs";
+import { useItems } from "lib/swr";
 
 const fetcher = async ({ url, filters }) => {
   const queryParams = new URLSearchParams(filters).toString();
@@ -15,37 +15,15 @@ const fetcher = async ({ url, filters }) => {
   return response.data;
 };
 
-const columns: Array<Column> = [
+export const columns: Array<Column> = [
   {
-    label: "created_at",
-    accessor: "createdAt",
-    format: (value: any) => dayjs(value).format("YYYY-MM-DD HH:mm"),
+    label: "provider",
+    accessor: "provider",
   },
-  {
-    label: "total_amount",
-    accessor: "totalAmount",
-  },
-  {
-    label: "order_items",
-    accessor: "orderItems",
-    format: (value: any, row) => {
-      const names = value.map((v: any) => v.name);
-      return names.join(", ");
-    },
-  },
-  {
-    label: "delivery_status",
-    accessor: "delivery.status",
-  },
-  {
-    label: "customer_name",
-    accessor: "name",
-    format: (value: any, row: any) =>
-      row.customer.first_name + " " + row.customer.last_name,
-  },
+  { label: "name", accessor: "name" },
 ];
 
-const TableContainer = ({ filters = {}, onRowClick }) => {
+const Overview = () => {
   const router = useRouter();
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize] = useState(5);
@@ -54,27 +32,16 @@ const TableContainer = ({ filters = {}, onRowClick }) => {
     data: { total, items } = { total: 0, items: [] },
     error,
     isLoading,
-  } = useSWR(
-    {
-      url: "/api/order/all",
-      filters: {
-        pageNumber,
-        pageSize,
-        keyword,
-        ...filters,
-      },
-    },
-    fetcher
-  );
+  } = useItems("/api/shipping-method/all", { pageNumber, pageSize, keyword });
   const { t } = useTranslation();
 
   const goToCreate = () => {
-    router.push("/order/new");
+    router.push("/company/shipping-method/new");
   };
 
   return (
     <Stack spacing={2}>
-      <Typography>{t("order")}</Typography>
+      <Typography>{t("Shipping Method")}</Typography>
       <Stack
         justifyContent={"space-between"}
         direction="row"
@@ -96,7 +63,6 @@ const TableContainer = ({ filters = {}, onRowClick }) => {
         columns={columns}
         pageSize={pageSize}
         isLoading={isLoading}
-        onRowClick={onRowClick}
       />
       {!isLoading && items.length === 0 && (
         <Stack
@@ -119,4 +85,4 @@ const TableContainer = ({ filters = {}, onRowClick }) => {
   );
 };
 
-export default TableContainer;
+export default Overview;
