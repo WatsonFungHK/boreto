@@ -45,9 +45,10 @@ const AddressForm = ({ multiple = true }) => {
 
   return (
     <Stack spacing={2}>
-      <Stack justifyContent={"space-between"} direction="row">
-        <Typography variant="h6">{t(`addresses`)}</Typography>
-        {multiple && (
+      {multiple && (
+        <Stack justifyContent={"space-between"} direction="row">
+          <Typography variant="h6">{t(`addresses`)}</Typography>
+
           <Button
             startIcon={<AddIcon />}
             variant="contained"
@@ -55,8 +56,8 @@ const AddressForm = ({ multiple = true }) => {
           >
             Add
           </Button>
-        )}
-      </Stack>
+        </Stack>
+      )}
       {addresses.fields.map((address, index) => {
         const fieldName = `addresses.${index}`;
         const errors = addressesErrors?.addresses?.[index] || {};

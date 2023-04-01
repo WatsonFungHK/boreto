@@ -6,10 +6,14 @@ import {
   Typography,
   Stack,
   Divider,
+  TextField,
+  IconButton,
 } from "@mui/material";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import colors from "theme/colors";
+import { formatAddress } from "./AddressDisplay";
+import { ContentCopy } from "@mui/icons-material";
 
 const AddressPicker = ({ addresses = [] }) => {
   const { control } = useFormContext();
@@ -32,8 +36,8 @@ const AddressPicker = ({ addresses = [] }) => {
                   gap={1}
                 >
                   {addresses.map((address) => {
-                    const { line_1, line_2, line_3, city, state, country } =
-                      address;
+                    const text = formatAddress(address);
+
                     return (
                       <FormControlLabel
                         key={address.id}
@@ -43,16 +47,30 @@ const AddressPicker = ({ addresses = [] }) => {
                           <Stack
                             gap={1}
                             sx={{
-                              padding: "8px 16px 0px",
+                              width: "100%",
                               fontSize: "12px",
                             }}
                           >
-                            {line_1 && <Typography>{line_1}</Typography>}
-                            {line_2 && <Typography>{line_2}</Typography>}
-                            {line_3 && <Typography>{line_3}</Typography>}
-                            {city && <Typography>{city}</Typography>}
-                            {state && <Typography>{state}</Typography>}
-                            {country && <Typography>{country}</Typography>}
+                            <TextField
+                              value={text}
+                              disabled
+                              multiline
+                              fullWidth
+                              InputProps={{
+                                endAdornment: (
+                                  <IconButton
+                                    onClick={(event) => {
+                                      event.preventDefault();
+                                      event.stopPropagation();
+                                      navigator.clipboard.writeText(text);
+                                    }}
+                                    size="small"
+                                  >
+                                    <ContentCopy />
+                                  </IconButton>
+                                ),
+                              }}
+                            />
                           </Stack>
                         }
                       />
