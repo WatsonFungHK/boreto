@@ -29,7 +29,7 @@ export const schema = object().shape({
   credit_amount: number().min(0).optional(),
   birth_date: string().optional().nullable(),
   joined_date: string().optional().nullable(),
-  addresses: array().of(addressSchema),
+  addresses: array().of(addressSchema).min(0),
 });
 
 const defaultValues = {
@@ -65,7 +65,13 @@ const upsertItem = async (id: string, item: FormData) => {
   return response.data;
 };
 
-const CustomerForm = ({ setCustomer }: { setCustomer: Function }) => {
+const CustomerForm = ({
+  setCustomer,
+  snapshot,
+}: {
+  snapshot?: FormData;
+  setCustomer?: Function;
+}) => {
   const router = useRouter();
 
   const {
@@ -75,7 +81,7 @@ const CustomerForm = ({ setCustomer }: { setCustomer: Function }) => {
 
   const { t } = useTranslation("common", { keyPrefix: "customer" });
   const methods = useForm<FormData>({
-    defaultValues,
+    defaultValues: snapshot || defaultValues,
     resolver: yupResolver(schema),
   });
   const {
@@ -87,11 +93,12 @@ const CustomerForm = ({ setCustomer }: { setCustomer: Function }) => {
     formState: { errors },
   } = methods;
   const { gender } = watch();
+  console.log("errors: ", errors);
 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!isNew) {
+    if (!isNew && !snapshot) {
       const fetchItem = async () => {
         try {
           setIsLoading(true);

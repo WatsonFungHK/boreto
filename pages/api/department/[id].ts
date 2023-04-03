@@ -35,29 +35,33 @@ export default async function handler(
     }
     if (req.method === 'POST') {
       const session = await getSession()
-      const id = req.body.id || cuid();
-      const { updated_at, created_at, users, ...data } = req.body;
-      const response = await prisma.department.upsert({
-        where: {
-          id,
-        },
-        create:  {
-          ...data,
-          id,
-          companyId,
-          users: {
-            connect: users.map((id) => ({ id }))
-          }
-        },
-        update: {
-          ...data,
-          users: {
-            set: users.map((id) => ({ id }))
-          }
-        }
-      });
-        
-      res.status(200).json(response);
+      const { id, users, ...data } = req.body;
+
+      if (!id) {
+        const createdDepartment = await prisma.department.create({
+          data: {
+            ...data,
+            companyId,
+            users: {
+              connect: users.map((id) => ({ id })),
+            },
+          },
+        });
+        res.status(200).json(createdDepartment);
+        // return createdDepartment
+      } else {
+        const updatedDepartment = await prisma.department.update({
+          where: { id },
+          data: {
+            ...data,
+            users: {
+              set: users.map((id) => ({ id })),
+            },
+          },
+        });
+        res.status(200).json(updatedDepartment);
+        // return updatedDepartment
+      }
     }
   } catch (error) {
     console.log('error: ', error);

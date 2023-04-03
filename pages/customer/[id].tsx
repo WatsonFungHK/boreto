@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import Form from "./Form";
 import OrderHistory from "./_orderHistory";
+import TimelinePage from "components/TimelinePage";
 import colors from "theme/colors";
 
 const Customer = () => {
@@ -41,10 +42,18 @@ const Customer = () => {
               </Stack>
             }
           />
+          <Tab label={<Typography>History</Typography>} />
         </Tabs>
       )}
       {value === 0 && <Form setCustomer={setCustomer} />}
       {value === 1 && <OrderHistory filters={{ customerId: id }} />}
+      {value === 2 && (
+        <TimelinePage
+          targetModel={"Customer"}
+          targetId={id as string}
+          SnapshotForm={Form}
+        />
+      )}
     </Stack>
   );
 };

@@ -9,13 +9,13 @@ import Paper from "@mui/material/Paper";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import _ from "lodash";
-import { Skeleton } from "@mui/lab";
-import { Stack, Typography } from "@mui/material";
+import {} from "@mui/lab";
+import { Skeleton } from "@mui/material";
 
 export interface Column {
   label: string;
   accessor: string;
-  format?: () => string;
+  format?: () => any;
 }
 
 const createArrayFromNumber = (num) => {
@@ -30,7 +30,7 @@ const myNum = 5;
 const myArray = createArrayFromNumber(myNum);
 
 export default function BasicTable({
-  rows,
+  rows = [],
   columns,
   pageSize,
   isLoading,

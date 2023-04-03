@@ -16,8 +16,6 @@ export default async function handler(
 ) {
   try {
     if (req.method === 'GET') {
-
-      console.log('req.query: ', req.query);
       const { type, id } = req.query
       const response = await prisma.address.findMany({
         where: getWhereClause(type, id)

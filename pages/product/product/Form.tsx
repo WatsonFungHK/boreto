@@ -11,6 +11,8 @@ import {
   FormControl,
   Typography,
   Grid,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
@@ -20,6 +22,7 @@ import { string, object, number } from "yup";
 import useSWR from "swr";
 
 const defaultValues = {
+  type: "P" as "P" | "S",
   name: "",
   description: "",
   unit: 0,
@@ -35,12 +38,21 @@ const fetcher = async (url) => {
 };
 
 export const schema = object().shape({
+  type: string().oneOf(["P", "S"]).required("required"),
   name: string().required("required"),
   description: string().optional(),
-  unit: number().positive().required("required"),
+  unit: number().when("type", {
+    is: "P",
+    then: (schema) => schema.positive().required("required"),
+    otherwise: (schema) => schema.optional(),
+  }),
   price: number().positive().required("required"),
   categoryId: string().optional(),
-  supplierId: string().optional(),
+  supplierId: string().when("type", {
+    is: "P",
+    then: (schema) => schema.optional(),
+    otherwise: (schema) => schema.optional().nullable(),
+  }),
   status: string().required("required"),
 });
 
@@ -56,7 +68,7 @@ const upsertItem = async (id: string, item: FormData) => {
   return response.data;
 };
 
-const ProductForm = ({}: {}) => {
+const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
   const router = useRouter();
 
   const {
@@ -75,19 +87,21 @@ const ProductForm = ({}: {}) => {
 
   const { t } = useTranslation("common", { keyPrefix: "product" });
   const methods = useForm<FormData>({
-    defaultValues,
+    defaultValues: snapshot || defaultValues,
     resolver: yupResolver(schema),
   });
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    setValue,
+    formState: { errors, isDirty, isValid, isSubmitting },
   } = methods;
   const [isLoading, setIsLoading] = useState(false);
+  const { type, supplierId } = methods.watch();
 
   useEffect(() => {
-    if (!isNew) {
+    if (!isNew && !snapshot) {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
@@ -119,19 +133,35 @@ const ProductForm = ({}: {}) => {
     }
   };
 
-  console.log("isLoading: ", isLoading);
-  console.log("isLoadingCategories: ", isLoadingCategories);
-  console.log("isLoadingSuppliers: ", isLoadingSuppliers);
   if (isLoading || isLoadingCategories || isLoadingSuppliers)
     return <div>Loading...</div>;
 
   return (
     <Stack spacing={2}>
       <Typography variant="h5">
-        {isNew ? t("create-product") : t("edit-product")}
+        {isNew ? t("create") : t("edit-product")}
       </Typography>
       <FormProvider {...methods}>
-        <Stack spacing={2} direction="column">
+        {isNew && (
+          <Controller
+            name="type"
+            control={methods.control}
+            render={({ field: { value } }) => {
+              return (
+                <Tabs
+                  value={value}
+                  onChange={() => {
+                    methods.setValue("type", value === "P" ? "S" : "P");
+                  }}
+                >
+                  <Tab value={"P"} label={t("product")} />
+                  <Tab value={"S"} label={t("service")} />
+                </Tabs>
+              );
+            }}
+          />
+        )}
+        <Stack spacing={2}>
           <Stack spacing={1}>
             <Typography>{t("name")}</Typography>
             <TextField
@@ -163,17 +193,6 @@ const ProductForm = ({}: {}) => {
             />
           </Stack>
           <Stack spacing={1}>
-            <Typography>{t("unit")}</Typography>
-            <TextField
-              type="number"
-              inputProps={{ min: 0 }}
-              {...register("unit")}
-              error={!!errors.unit}
-              helperText={errors.unit?.message}
-              fullWidth
-            />
-          </Stack>
-          <Stack spacing={1}>
             <Typography>{t("category")}</Typography>
             <FormControl fullWidth error={!!errors.categoryId}>
               <Controller
@@ -191,28 +210,44 @@ const ProductForm = ({}: {}) => {
               />
             </FormControl>
           </Stack>
-          <Stack spacing={1}>
-            <Typography>{t("supplier")}</Typography>
-            <FormControl fullWidth error={!!errors.supplierId}>
-              <Controller
-                control={methods.control}
-                name="supplierId"
-                render={({ field }) => (
-                  <Select {...field}>
-                    {suppliers.map((item) => (
-                      <MenuItem value={item.id} key={item.id}>
-                        {item.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
-          </Stack>
+          {type === "P" && (
+            <>
+              <Stack spacing={1}>
+                <Typography>{t("unit")}</Typography>
+                <TextField
+                  type="number"
+                  inputProps={{ min: 0 }}
+                  {...register("unit")}
+                  error={!!errors.unit}
+                  helperText={errors.unit?.message}
+                  fullWidth
+                />
+              </Stack>
+              <Stack spacing={1}>
+                <Typography>{t("supplier")}</Typography>
+                <FormControl fullWidth error={!!errors.supplierId}>
+                  <Controller
+                    control={methods.control}
+                    name="supplierId"
+                    render={({ field }) => (
+                      <Select {...field}>
+                        {suppliers.map((item) => (
+                          <MenuItem value={item.id} key={item.id}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+              </Stack>
+            </>
+          )}
           <LoadingButton
             type="submit"
             variant="contained"
             loading={isLoading}
+            disabled={!isDirty}
             onClick={handleSubmit(onSubmit)}
           >
             {t(isNew ? "create" : "update")}

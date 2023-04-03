@@ -24,7 +24,6 @@ export default async function handler(
         count: entry._count.gender,
       }));
     
-      console.log('formattedData: ', formattedData);
       res.status(200).json({ items: formattedData });
       return;
     }

@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { string, object, array } from "yup";
-import AddressForm from "components/AddressForm";
+import AddressForm, { addressSchema } from "components/AddressForm";
 import Autocomplete from "components/Autocomplete";
 import useStaffOptions from "../hooks/useStaffOptions";
 
@@ -36,17 +36,7 @@ export const schema = object().shape({
   description: string().optional(),
   status: string().optional(),
   type: string().required("required"),
-  addresses: array().of(
-    object({
-      line_1: string().required("required"),
-      line_2: string().optional(),
-      line_3: string().optional(),
-      city: string().required("required"),
-      state: string().required("required"),
-      postal_code: string().optional(),
-      country: string().required("required"),
-    })
-  ),
+  addresses: array().of(addressSchema),
   users: array(),
 });
 

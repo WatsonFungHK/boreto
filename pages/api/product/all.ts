@@ -10,7 +10,12 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { keyword = '', pageNumber, pageSize } = req.query;
+    const { keyword = '', pageNumber, pageSize, type } = req.query as {
+      keyword?: string;
+      pageNumber?: string;
+      pageSize?: string;
+      type?: string;
+    };
     const filterConditions = filterFields.map((field) => {
       return {
         [field]: {
@@ -20,6 +25,7 @@ export default async function handler(
       }
     });
     const whereClause = {
+      type: type !== 'all' ? type : undefined,
       companyId,
       NOT: {
         status: 'D'

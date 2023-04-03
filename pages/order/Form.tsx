@@ -26,6 +26,7 @@ import AddressPicker from "components/AddressPicker";
 import { useItems, getItem, upsertItem } from "lib/swr";
 import useDynamicOptions from "hooks/useDynamicOptions";
 import { Visibility } from "@mui/icons-material";
+import colors from "theme/colors";
 
 export const schema = object().shape({
   isNew: boolean(),
@@ -44,6 +45,7 @@ export const schema = object().shape({
       }),
       product: object({
         value: string().required("required"),
+        type: string().required("required"),
         label: string().required("required"),
         price: number().required("required"),
       }),
@@ -52,7 +54,13 @@ export const schema = object().shape({
     })
   ),
   methodId: string().required("required"),
-  addressId: string().required("required"),
+  addressId: string().when("orderItems", {
+    is: (orderItems: any[]) => {
+      return orderItems.every((item) => item.product.type === "S");
+    },
+    then: (schema) => schema.required("required"),
+    otherwise: (schema) => schema.nullable(),
+  }),
 });
 
 const defaultValues = {
@@ -70,8 +78,10 @@ const generateCustomerOptions = (customers: any[]) => {
 };
 
 const generateOrderItems = (orderItems: any[]) => {
-  return orderItems.map(({ id, name, quantity, price, productId }) => {
-    const products = generateProductOptions([{ id, name, price }]);
+  return orderItems.map(({ id, name, quantity, price, productId, type }) => {
+    console.log("name: ", name);
+    console.log("type: ", type);
+    const products = generateProductOptions([{ id, name, price, type }]);
     return {
       productId,
       product: products[0],
@@ -109,7 +119,7 @@ const OrderForm = ({}: {}) => {
     formState: { errors },
   } = methods;
 
-  const { customerId } = watch();
+  const { customerId, orderItems } = watch();
   const { data: addresses, error: customerError } = useItems(
     `/api/address/customer/${customerId}`
   );
@@ -122,6 +132,9 @@ const OrderForm = ({}: {}) => {
   }
 
   const [isLoading, setIsLoading] = useState(false);
+  const needShipping = !orderItems.every((item) => {
+    return item.product?.type === "S";
+  });
 
   useEffect(() => {
     if (!isNew) {
@@ -248,9 +261,16 @@ const OrderForm = ({}: {}) => {
               </CardContent>
             </Card>
           )}
-          {!(Array.isArray(addresses) && addresses.length > 0) && (
-            <Typography>{t("no-address-to-create-shipping")}</Typography>
-          )}
+          {!(Array.isArray(addresses) && addresses.length > 0) &&
+            needShipping && (
+              <Typography
+                sx={{
+                  color: colors.red80,
+                }}
+              >
+                {t("no-address-to-create-shipping")}
+              </Typography>
+            )}
           <OrderItemForm readOnly={!isNew} defaultExpanded />
           {isNew && (
             <LoadingButton

@@ -104,7 +104,7 @@ const TableContainer = ({ filters = {}, onRowClick }) => {
         isLoading={isLoading}
         onRowClick={onRowClick}
       />
-      {!isLoading && items.length === 0 && (
+      {!isLoading && items?.length === 0 && (
         <Stack
           textAlign={"center"}
           sx={{

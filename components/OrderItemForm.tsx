@@ -57,6 +57,7 @@ export const generateProductOptions = (productOptions) => {
       value: productOption.id,
       label: productOption.name,
       price: productOption.price,
+      type: productOption.type,
     };
   });
 };
@@ -164,7 +165,16 @@ const OrderItemForm = ({
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <Stack spacing={1}>
-                      <Typography>{t("product")}</Typography>
+                      {item.product?.type === "P" && (
+                        <Typography>{t("product")}</Typography>
+                      )}
+                      {item.product?.type === "S" && (
+                        <Typography>{t("service")}</Typography>
+                      )}
+                      {item.product?.type !== "P" &&
+                        item.product?.type !== "S" && (
+                          <Typography>{t("product/service")}</Typography>
+                        )}
                       <FormControl fullWidth error={!!errors.product}>
                         <Controller
                           control={control}

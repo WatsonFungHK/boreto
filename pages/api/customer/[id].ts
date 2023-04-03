@@ -49,7 +49,7 @@ const update = async (req: NextApiRequest, res: NextApiResponse) => {
     })
   );
 
-  res.status(200).json(updatedCustomer);
+  return updatedCustomer;
 };
 
 export default async function handler(
@@ -80,11 +80,12 @@ export default async function handler(
       return;
     }
     if (req.method === 'POST') {
+      let response;
       if (req.body.id) {
-        await update(req, res)
+        response = await update(req, res)
       } else {
         const { updated_at, created_at, addresses, ...data } = req.body;
-        const response = await prisma.customer.create({
+        response = await prisma.customer.create({
           data: {
             ...data,
             companyId,
@@ -93,10 +94,10 @@ export default async function handler(
             }
           }
         })
-        res.status(200).json(response);
-        return
       }
-
+      res.status(200).json(response);
+      console.log('response: ', response);
+      return response;
     }
   } catch (error) {
     console.log('error: ', error);

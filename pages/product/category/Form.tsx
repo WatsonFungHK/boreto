@@ -41,10 +41,10 @@ export const schema = object().shape({
 
 export type FormData = ReturnType<typeof schema["cast"]>;
 
-const generateOptions = (items) =>
+export const generateOptions = (items) =>
   items.map(({ id, name }) => ({ value: id, label: name }));
 
-const ProductCategoryForm = ({}: {}) => {
+const ProductCategoryForm = ({ snapshot }: { snapshot?: FormData }) => {
   const router = useRouter();
 
   const {
@@ -54,7 +54,7 @@ const ProductCategoryForm = ({}: {}) => {
 
   const { t } = useTranslation("common", { keyPrefix: "product-category" });
   const methods = useForm<FormData>({
-    defaultValues,
+    defaultValues: snapshot || defaultValues,
     resolver: yupResolver(schema),
   });
   const {
@@ -72,7 +72,7 @@ const ProductCategoryForm = ({}: {}) => {
   const { status } = watch();
 
   useEffect(() => {
-    if (!isNew) {
+    if (!isNew && !snapshot) {
       const fetchItem = async () => {
         try {
           setIsLoading(true);

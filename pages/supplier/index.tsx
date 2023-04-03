@@ -76,7 +76,7 @@ const TableContainer = () => {
         pageSize={pageSize}
         isLoading={isLoading}
       />
-      {!isLoading && items.length === 0 && (
+      {!isLoading && items?.length === 0 && (
         <Stack
           textAlign={"center"}
           sx={{

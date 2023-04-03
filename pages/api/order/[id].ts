@@ -167,7 +167,6 @@ export default async function handler(
             id: methodId
           }
         });
-        console.log('method: ', method);
 
         const address = await prisma.address.findUnique({
           where: {
@@ -185,7 +184,6 @@ export default async function handler(
             type: true,
           }
         });
-        console.log('address: ', address);
         const response = await prisma.order.create({
           data: {
             ...data,

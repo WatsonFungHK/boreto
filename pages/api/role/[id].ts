@@ -44,47 +44,38 @@ export default async function handler(
     }
     if (req.method === 'POST') {
       const session = await getSession()
-      const id = req.body.id || cuid();
-      const { updated_at, created_at, users, permissions, ...data } = req.body;
+      const { updated_at, created_at, users, permissions, id, ...data } = req.body;
 
-      const createBody = {...data, id, companyId };
-      const response = await prisma.role.upsert({
-        where: {
-          id,
-        },
-        create: {
-          ...data,
-          id,
-          companyId,
-          users: {
-            create: users.map((id) => ({ user: {
-              connect: { id }
-            }}))
+
+      if (!id) {
+        const createdRole = await prisma.role.create({
+          data: {
+            ...data,
+            companyId,
+            users: {
+              connect: users.map((userId) => ({ user: { connect: { id: userId } } })),
+            },
+            permissions: {
+              connect: permissions.map((permissionId) => ({ permission: { connect: { id: permissionId } } })),
+            },
           },
-          permissions: {
-            create: permissions.map((id) => ({ permission: {
-              connect: { id }
-            }}))
+        });
+        res.status(200).json(createdRole);
+      } else {
+        const updatedRole = await prisma.role.update({
+          where: { id },
+          data: {
+            ...data,
+            users: {
+              connect: users.map((userId) => ({ user: { connect: { id: userId } } })),
+            },
+            permissions: {
+              connect: permissions.map((permissionId) => ({ permission: { connect: { id: permissionId } } })),
+            },
           },
-        },
-        update: {
-          ...data,
-          users: {
-            deleteMany: {}, // Disconnect and delete all existing related user records
-            create: users.map((id) => ({ user: {
-              connect: { id }
-            }})), // Add new user connections
-          },
-          permissions: {
-            deleteMany: {}, // Disconnect and delete all existing related permission records
-            create: permissions.map((id) => ({ permission: {
-              connect: { id }
-            }})), // Add new permission connections
-          },
-        }
-      });
-        
-      res.status(200).json(response);
+        });
+        res.status(200).json(updatedRole);
+      }
     }
   } catch (error) {
     console.log('error: ', error);

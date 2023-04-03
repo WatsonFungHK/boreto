@@ -28,27 +28,32 @@ export default async function handler(
       const { updated_at, created_at, products, ...data } = req.body;
 
       const createBody = {...data, id, companyId };
-      const response = await prisma.productCategory.upsert({
-        where: {
-          id,
-        },
-        create: {
-          ...data,
-          id,
-          companyId,
-          products: {
-            connect: products.map((id) => ({id}))
-          }
-        },
-        update: {
-          ...data,
-          products: {
-            set: products.map((id) => ({ id }))
-          }
-        }
-      });
-        
-      res.status(200).json(response);
+      if (!req.body.id) {
+        // If there's no id in the request body, create a new product category
+        const response = await prisma.productCategory.create({
+          data: {
+            ...createBody,
+            products: {
+              connect: products.map((id) => ({ id })),
+            },
+          },
+        });
+    
+        res.status(200).json(response);
+      } else {
+        // If there's an id in the request body, update the existing product category
+        const response = await prisma.productCategory.update({
+          where: { id },
+          data: {
+            ...data,
+            products: {
+              set: products.map((id) => ({ id })),
+            },
+          },
+        });
+    
+        res.status(200).json(response);
+      }
     }
   } catch (error) {
     console.log('error: ', error);

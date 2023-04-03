@@ -24,6 +24,7 @@ model User {
   officeId     String?
   office       Office?     @relation(fields: [officeId], references: [id])
   UserRole     UserRole[]
+  AuditLog     AuditLog[]
 
   @@map(name: "users")
 }
@@ -103,6 +104,7 @@ model Company {
   Role                         Role[]
   Supplier                     Supplier[]
   Order                        Order[]
+  AuditLog                     AuditLog[]
 }
 
 model Account {
@@ -193,6 +195,7 @@ model Product {
   supplier    Supplier?        @relation(fields: [supplierId], references: [id])
   supplierId  String?
   OrderItem   OrderItem[]
+  type        String           @default("P") // 'P' = Product, 'S' = Service
 }
 
 model ProductImage {
@@ -354,4 +357,19 @@ model ShippingMethod {
   updatedAt   DateTime? @updatedAt
 
   Shipping Shipping[]
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  action      String
+  targetModel String
+  targetId    String
+  data        Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  companyId   String
+  status      String    @default("A")
+  company     Company   @relation(fields: [companyId], references: [id])
 }

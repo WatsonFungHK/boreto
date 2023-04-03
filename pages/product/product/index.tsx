@@ -1,10 +1,16 @@
-import { Button, Pagination, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  MenuItem,
+  Pagination,
+  Stack,
+  Typography,
+  Select,
+} from "@mui/material";
 import axiosClient from "lib/axiosClient";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import useSWR from "swr";
 import BasicTable from "components/BasicTable";
-import type { Column } from "components/BasicTable";
 import { useState } from "react";
 import DebouncedInput from "components/DebouncedInput";
 import { columns } from "./_constants";
@@ -20,6 +26,7 @@ const Overview = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize] = useState(10); // pageSize
   const [keyword, setKeyword] = useState("");
+  const [type, setType] = useState("all");
   const {
     data: { total, items } = { total: 0, items: [] },
     error,
@@ -31,6 +38,7 @@ const Overview = () => {
         pageNumber,
         pageSize,
         keyword,
+        type,
       },
     },
     fetcher
@@ -49,13 +57,31 @@ const Overview = () => {
         direction="row"
         alignItems={"center"}
       >
-        <DebouncedInput
-          debounceTimeout={500}
-          onKeyUp={(value) => {
-            setKeyword(value);
-            setPageNumber(1);
-          }}
-        />
+        <Stack spacing={1} direction="row">
+          <DebouncedInput
+            debounceTimeout={500}
+            onKeyUp={(value) => {
+              setKeyword(value);
+              setPageNumber(1);
+            }}
+          />
+          <Select
+            value={type}
+            onChange={(e) => {
+              setType(e.target.value);
+              setPageNumber(1);
+            }}
+            sx={{
+              "> div": {
+                padding: "0 14px",
+              },
+            }}
+          >
+            <MenuItem value={"all"}>{t("all")}</MenuItem>
+            <MenuItem value={"P"}>{t("product")}</MenuItem>
+            <MenuItem value={"S"}>{t("service")}</MenuItem>
+          </Select>
+        </Stack>
         <Button variant="contained" onClick={goToCreate}>
           {t("create")}
         </Button>
@@ -66,7 +92,7 @@ const Overview = () => {
         pageSize={pageSize}
         isLoading={isLoading}
       />
-      {!isLoading && items.length === 0 && (
+      {!isLoading && items?.length === 0 && (
         <Stack
           textAlign={"center"}
           sx={{

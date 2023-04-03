@@ -25,7 +25,6 @@ export default async function handler(
         },
       });
       
-      console.log('aggregatedData: ', aggregatedData);
       const bestProductCategories = aggregatedData
         .sort((a, b) => b._sum.quantity - a._sum.quantity)
         .slice(0, 5)
