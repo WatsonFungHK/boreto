@@ -29,7 +29,7 @@ export const addressSchema = object({
   country: string().required(),
 });
 
-export type addressScehma = ReturnType<typeof addressSchema["cast"]>;
+export type addressType = ReturnType<typeof addressSchema["cast"]>;
 
 const AddressForm = ({ multiple = true }) => {
   const { t } = useTranslation();

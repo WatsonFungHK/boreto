@@ -15,26 +15,28 @@ export default async function handler(
         where: {
           id: req.query.id,
         },
+        include: {
+          images: true,
+        }
       });
       
       res.status(200).json(response);
     }
     if (req.method === 'POST') {
       const session = await getSession()
-      const id = req.body.id || cuid();
       if (req.body.id) {
         const { updated_at, created_at, ...data } = req.body;
         const response = await prisma.product.update({
           where: {
-            id,
+            id: req.body.id,
           },
-          data: { ...data, id, companyId, },
+          data: { ...data, id: req.body.id, companyId, },
         });
         res.status(200).json(response);
       } else {
         const { updated_at, created_at, ...data } = req.body;
         const response = await prisma.product.create({
-          data: { ...data, id, companyId, },
+          data: { ...data, companyId, },
         });
           
         res.status(200).json(response);

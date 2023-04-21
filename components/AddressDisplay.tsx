@@ -1,7 +1,7 @@
 import { Stack, Typography } from "@mui/material";
-import { addressScehma } from "./AddressForm";
+import { addressType } from "./AddressForm";
 
-export const formatAddress = (address: addressScehma) => {
+export const formatAddress = (address: addressType) => {
   const { line_1, line_2, line_3, city, state, country, postal_code } = address;
   const addressText = [
     line_1,
@@ -18,7 +18,7 @@ export const formatAddress = (address: addressScehma) => {
   return addressText.join(",\n");
 };
 
-const AddressDisplay = ({ address = {} }: { address: addressScehma }) => {
+const AddressDisplay = ({ address = {} }: { address: addressType }) => {
   const { line_1, line_2, line_3, city, state, country, postal_code } = address;
   const addressText = [
     line_1,

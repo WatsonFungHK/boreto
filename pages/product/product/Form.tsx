@@ -18,8 +18,11 @@ import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import { string, object, number } from "yup";
+import { string, object, number, array } from "yup";
 import useSWR from "swr";
+import ImageForm, { imageSchema } from "components/ImageForm";
+import Dropzone from "components/Dropzone";
+import supabase from "lib/supabase";
 
 const defaultValues = {
   type: "P" as "P" | "S",
@@ -54,6 +57,7 @@ export const schema = object().shape({
     otherwise: (schema) => schema.optional().nullable(),
   }),
   status: string().required("required"),
+  images: array().of(imageSchema),
 });
 
 export type FormData = ReturnType<typeof schema["cast"]>;
@@ -119,6 +123,17 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
       fetchItem();
     }
   }, [isNew]);
+
+  const handleFile = async (file) => {
+    const data = await supabase.storage
+      .from("product-image")
+      .upload(file.name, file);
+    await supabase.from("product-image").insert({
+      productId: id as string,
+      name: file.name,
+      url: `https://jsxhhyfhmmrlusumnxbq.supabase.co/storage/v1/object/public/product-image/${data.path}`,
+    });
+  };
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -243,6 +258,7 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
               </Stack>
             </>
           )}
+          <Dropzone handleFile={handleFile} />
           <LoadingButton
             type="submit"
             variant="contained"

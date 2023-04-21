@@ -15,7 +15,7 @@ import { Skeleton } from "@mui/material";
 export interface Column {
   label: string;
   accessor: string;
-  format?: () => any;
+  format?: () => any | React.ReactNode;
 }
 
 const createArrayFromNumber = (num) => {
@@ -35,12 +35,14 @@ export default function BasicTable({
   pageSize,
   isLoading,
   onRowClick,
+  displayHeader = true,
 }: {
   rows: Array<any>;
   columns: Array<Column>;
   pageSize: number;
   isLoading: boolean;
   onRowClick?: Function;
+  displayHeader?: boolean;
 }) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -63,7 +65,7 @@ export default function BasicTable({
         }}
         onClick={defaultOnClick(row)}
       >
-        {columns.map(({ accessor, format = (value, row) => value }) => {
+        {columns.map(({ accessor, format = (value, row, index) => value }) => {
           let value = _.get(row, accessor);
           return (
             <TableCell
@@ -75,7 +77,7 @@ export default function BasicTable({
                 whiteSpace: "nowrap",
               }}
             >
-              {format(value, row)}
+              {format(value, row, index)}
             </TableCell>
           );
         })}
@@ -112,23 +114,25 @@ export default function BasicTable({
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }}>
-        <TableHead>
-          <TableRow>
-            {columns.map(({ label, accessor }) => (
-              <TableCell
-                key={accessor}
-                sx={{
-                  // make it ellsipis
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {t(label)}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
+        {displayHeader && (
+          <TableHead>
+            <TableRow>
+              {columns.map(({ label, accessor }) => (
+                <TableCell
+                  key={accessor}
+                  sx={{
+                    // make it ellsipis
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {t(label)}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+        )}
         <TableBody>{isLoading ? renderSkeleton() : renderRows()}</TableBody>
       </Table>
     </TableContainer>
