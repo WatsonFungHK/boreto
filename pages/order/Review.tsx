@@ -31,6 +31,7 @@ import useDynamicOptions from "hooks/useDynamicOptions";
 import { Visibility } from "@mui/icons-material";
 import AddressDisplay, { formatAddress } from "components/AddressDisplay";
 import { ContentCopy } from "@mui/icons-material";
+import PaymentForm from "components/PaymentForm";
 
 const ShippingStatus = {
   PENDING: "PENDING",
@@ -52,6 +53,22 @@ const ShippingStatusOptions = [
   { value: ShippingStatus.FAILED_DELIVERY, label: "Failed delivery" },
   { value: ShippingStatus.RETURNED, label: "Returned" },
   { value: ShippingStatus.CANCELLED, label: "Cancelled" },
+];
+
+const PaymentStatus = {
+  PENDING: "PENDING",
+  COMPLETED: "COMPLETED",
+};
+
+const PaymentStatusOptions = [
+  {
+    value: PaymentStatus.PENDING,
+    label: PaymentStatus.PENDING,
+  },
+  {
+    value: PaymentStatus.COMPLETED,
+    label: PaymentStatus.COMPLETED,
+  },
 ];
 
 export const schema = object().shape({
@@ -92,6 +109,18 @@ export const schema = object().shape({
       status: string().required("required"),
     })
   ),
+  Payment: array().of(
+    object({
+      id: string().required(),
+      method: object({
+        name: string().required("required"),
+      }),
+      cost: number().required("required"),
+      costType: string().required("required"),
+      amount: number().required("required"),
+      status: string().required("required"),
+    })
+  ),
 });
 
 const defaultValues = {
@@ -105,7 +134,7 @@ const defaultValues = {
   ],
 };
 
-export type FormData = ReturnType<typeof schema["cast"]>;
+export type FormData = ReturnType<(typeof schema)["cast"]>;
 const generateCustomerOptions = (customers: any[]) => {
   return customers.map(({ id, first_name, last_name }) => ({
     value: id,
@@ -153,9 +182,10 @@ const OrderDetail = ({}: {}) => {
     formState: { errors },
   } = methods;
 
-  const { customerId, Shipping } = watch();
+  const { customerId, Shipping, Payment } = watch();
 
   const [isUpdatingShipping, setIsUpdatingShipping] = useState(false);
+  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -203,7 +233,6 @@ const OrderDetail = ({}: {}) => {
     try {
       setIsUpdatingShipping(true);
       const shipping = watch(`Shipping.${index}`);
-      console.log("shipping: ", shipping);
       const { id, status } = shipping;
       const payload = {
         id,
@@ -215,6 +244,24 @@ const OrderDetail = ({}: {}) => {
       toast.error("Error updating shipping status");
     } finally {
       setIsUpdatingShipping(false);
+    }
+  };
+
+  const updatePaymentStatus = async (index) => {
+    try {
+      setIsUpdatingPayment(true);
+      const payment = watch(`Payment.${index}`);
+      const { id, status } = payment;
+      const payload = {
+        id,
+        status,
+      };
+      await upsertItem(`/api/payment/${id}`, payload);
+      toast.success("payment status updated");
+    } catch (err) {
+      toast.error("Error updating payment status");
+    } finally {
+      setIsUpdatingPayment(false);
     }
   };
 
@@ -254,7 +301,6 @@ const OrderDetail = ({}: {}) => {
               <Card>
                 <CardContent>
                   {Shipping.map(({ id, ...restShip }, index) => {
-                    console.log("restShip: ", restShip);
                     const fieldName =
                       `Shipping.${index}.method` as `Shipping.${number}.method`;
 
@@ -340,10 +386,6 @@ const OrderDetail = ({}: {}) => {
                                           `Shipping.${index}.status`,
                                           e.target.value
                                         );
-                                        console.log(
-                                          "        e.target.value: ",
-                                          e.target.value
-                                        );
                                       }}
                                       fullWidth
                                     >
@@ -377,6 +419,77 @@ const OrderDetail = ({}: {}) => {
               </Card>
             </>
           )}
+
+          {Payment && <Typography variant="h6">Payment</Typography>}
+          {Payment?.map((payment, index) => {
+            return (
+              <Card key={payment.id}>
+                <CardContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <Stack spacing={1}>
+                        <Typography>{payment.method.name}</Typography>
+                        <Typography>
+                          {payment.cost + payment.costType === "P" && "%"}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Stack spacing={1}>
+                        <Typography>
+                          {`${payment.cost} ${
+                            payment.costType === "P" ? "%" : ""
+                          }`}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Stack spacing={1}>
+                        <Typography>{t("status")}</Typography>
+                        <Stack direction={"row"} spacing={2}>
+                          <Controller
+                            name={`Payment.${index}.status`}
+                            control={control}
+                            render={({ field: { value } }) => {
+                              return (
+                                <Select
+                                  value={value}
+                                  onChange={(e) => {
+                                    setValue(
+                                      `Payment.${index}.status`,
+                                      e.target.value
+                                    );
+                                  }}
+                                  fullWidth
+                                >
+                                  {PaymentStatusOptions.map(
+                                    ({ value, label }) => {
+                                      return (
+                                        <MenuItem key={value} value={value}>
+                                          {label}
+                                        </MenuItem>
+                                      );
+                                    }
+                                  )}
+                                </Select>
+                              );
+                            }}
+                          />
+                          <LoadingButton
+                            variant="contained"
+                            loading={isUpdatingPayment}
+                            onClick={() => updatePaymentStatus(index)}
+                          >
+                            Update
+                          </LoadingButton>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            );
+          })}
           <OrderItemForm readOnly={!isNew} defaultExpanded />
         </Stack>
       </FormProvider>

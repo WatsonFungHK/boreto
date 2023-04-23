@@ -15,7 +15,7 @@ import { Skeleton } from "@mui/material";
 export interface Column {
   label: string;
   accessor: string;
-  format?: () => any | React.ReactNode;
+  format?: (value: any, row: any, index: number) => any | React.ReactNode;
 }
 
 const createArrayFromNumber = (num) => {

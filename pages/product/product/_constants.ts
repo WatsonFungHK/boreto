@@ -18,6 +18,10 @@ export const columns: Array<Column> = [
     accessor: "price",
   },
   {
+    label: "unit",
+    accessor: "unit",
+  },
+  {
     label: "category",
     accessor: "category.name",
   },

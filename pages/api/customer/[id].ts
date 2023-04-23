@@ -96,8 +96,6 @@ export default async function handler(
         })
       }
       res.status(200).json(response);
-      console.log('response: ', response);
-      return response;
     }
   } catch (error) {
     console.log('error: ', error);

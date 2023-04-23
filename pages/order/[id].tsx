@@ -66,7 +66,7 @@ function OrderPage() {
                 <Typography variant="body1" component={"span"}>
                   {action}
                 </Typography>
-                {targetModel === "Shipping" && (
+                {["Shipping", "Payment"].includes(targetModel) && (
                   <>
                     <Typography variant="body1" component={"span"}>
                       {targetModel}

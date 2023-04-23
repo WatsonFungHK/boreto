@@ -16,6 +16,11 @@ export default async function handler(
       const order = await prisma.order.findUnique({
         where: { id: id as string },
         include: {
+          Payment: {
+            select: {
+              id: true,
+            }
+          },
           Shipping: {
             select: {
               id: true,
@@ -34,6 +39,12 @@ export default async function handler(
             targetModel: 'Shipping',
             targetId: {
               in: order.Shipping.map((shipping) => shipping.id),
+            },
+          },
+          {
+            targetModel: 'Payment',
+            targetId: {
+              in: order.Payment.map((payment) => payment.id),
             },
           },
         ],

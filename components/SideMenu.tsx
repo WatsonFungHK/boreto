@@ -81,6 +81,11 @@ export const menuItems = [
         link: "/company/shipping-method",
       },
       {
+        label: "payment",
+        icon: <Settings />,
+        link: "/company/payment-method",
+      },
+      {
         label: "settings",
         icon: <Settings />,
         link: "/company/settings",

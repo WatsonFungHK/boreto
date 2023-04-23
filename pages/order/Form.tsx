@@ -27,6 +27,7 @@ import { useItems, getItem, upsertItem } from "lib/swr";
 import useDynamicOptions from "hooks/useDynamicOptions";
 import { Visibility } from "@mui/icons-material";
 import colors from "theme/colors";
+import PaymentForm, { paymentSchema } from "components/PaymentForm";
 
 export const schema = object().shape({
   isNew: boolean(),
@@ -61,15 +62,17 @@ export const schema = object().shape({
     then: (schema) => schema.required("required"),
     otherwise: (schema) => schema.nullable(),
   }),
+  payment: paymentSchema,
 });
 
 const defaultValues = {
   isNew: true,
   customerId: undefined,
   orderItems: [{}],
+  payment: {},
 };
 
-export type FormData = ReturnType<typeof schema["cast"]>;
+export type FormData = ReturnType<(typeof schema)["cast"]>;
 const generateCustomerOptions = (customers: any[]) => {
   return customers.map(({ id, first_name, last_name }) => ({
     value: id,
@@ -118,6 +121,7 @@ const OrderForm = ({}: {}) => {
     control,
     formState: { errors },
   } = methods;
+  console.log("errors: ", errors);
 
   const { customerId, orderItems } = watch();
   const { data: addresses, error: customerError } = useItems(
@@ -272,6 +276,11 @@ const OrderForm = ({}: {}) => {
               </Typography>
             )}
           <OrderItemForm readOnly={!isNew} defaultExpanded />
+          <Card>
+            <CardContent>
+              <PaymentForm />
+            </CardContent>
+          </Card>
           {isNew && (
             <LoadingButton
               type="submit"

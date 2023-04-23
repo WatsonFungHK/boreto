@@ -11,36 +11,34 @@ export default async function handler(
 ) {
   try {
     if (req.method === 'GET') {
-      const response = await prisma.product.findUnique({
+      const response = await prisma.paymentMethod.findUnique({
         where: {
-          id: req.query.id,
+          id: req.query.id
         },
-        include: {
-          images: true,
-        }
       });
       
       res.status(200).json(response);
     }
     if (req.method === 'POST') {
       const session = await getSession()
+      const id = req.body.id || cuid();
+      const { updated_at, created_at, ...data } = req.body;
+
+      let response;
       if (req.body.id) {
-        const { updated_at, created_at, ...data } = req.body;
-        const response = await prisma.product.update({
+        response = await prisma.paymentMethod.update({
           where: {
             id: req.body.id,
           },
           data: { ...data, id: req.body.id, companyId, },
         });
-        res.status(200).json(response);
       } else {
-        const { updated_at, created_at, ...data } = req.body;
-        const response = await prisma.product.create({
+        response = await prisma.paymentMethod.create({
           data: { ...data, companyId, },
         });
-          
-        res.status(200).json(response);
-      }
+      };
+        
+      res.status(200).json(response);
     }
   } catch (error) {
     console.log('error: ', error);

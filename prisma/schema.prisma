@@ -105,6 +105,7 @@ model Company {
   Supplier                     Supplier[]
   Order                        Order[]
   AuditLog                     AuditLog[]
+  PaymentMethod                PaymentMethod[]
 }
 
 model Account {
@@ -178,24 +179,25 @@ model ProductCategory {
 }
 
 model Product {
-  id          String           @id @default(cuid())
-  name        String
-  description String?
-  price       Int
-  categoryId  String?
-  category    ProductCategory? @relation(fields: [categoryId], references: [id])
-  images      ProductImage[]
-  companyId   String
-  company     Company          @relation(fields: [companyId], references: [id])
-  unit        Int
-  status      String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
-  created_at  DateTime         @default(now())
-  updated_at  DateTime?        @updatedAt
-  prices      ProductPrice[]
-  supplier    Supplier?        @relation(fields: [supplierId], references: [id])
-  supplierId  String?
-  OrderItem   OrderItem[]
-  type        String           @default("P") // 'P' = Product, 'S' = Service
+  id           String           @id @default(cuid())
+  name         String
+  description  String?
+  price        Int
+  categoryId   String?
+  category     ProductCategory? @relation(fields: [categoryId], references: [id])
+  images       ProductImage[]
+  companyId    String
+  company      Company          @relation(fields: [companyId], references: [id])
+  unit         Int
+  pending_unit Int              @default(0)
+  status       String           @default("A") // 'A' = Active, 'I' = Inactive, 'D' = Deleted
+  created_at   DateTime         @default(now())
+  updated_at   DateTime?        @updatedAt
+  prices       ProductPrice[]
+  supplier     Supplier?        @relation(fields: [supplierId], references: [id])
+  supplierId   String?
+  OrderItem    OrderItem[]
+  type         String           @default("P") // 'P' = Product, 'S' = Service
 }
 
 model ProductImage {
@@ -304,6 +306,7 @@ model Order {
   company     Company     @relation(fields: [companyId], references: [id])
   companyId   String
   totalAmount Float?
+  Payment     Payment[]
 }
 
 // all are snapshot of product at the time of order
@@ -361,6 +364,34 @@ model ShippingMethod {
   updatedAt   DateTime? @updatedAt
 
   Shipping Shipping[]
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id])
+  methodId  String
+  method    PaymentMethod @relation(fields: [methodId], references: [id])
+  amount    Float
+  cost      Float?
+  costType  String? // 'P' = Percentage, 'F' = Fixed
+  status    String        @default("P") // 'P' = Pending, 'C' = Completed, 'F' = Failed
+  createdAt DateTime      @default(now())
+  updatedAt DateTime?     @updatedAt
+}
+
+model PaymentMethod {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  cost        Float?
+  costType    String? // 'P' = Percentage, 'F' = Fixed
+  companyId   String
+  status      String    @default("A")
+  company     Company   @relation(fields: [companyId], references: [id])
+  Payment     Payment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
 }
 
 model AuditLog {

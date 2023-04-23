@@ -134,6 +134,19 @@ export default async function handler(
                 }
               }
             }
+          },
+          Payment: {
+            select: {
+              id: true,
+              status: true,
+              cost: true,
+              costType: true,
+              method: {
+                select: {
+                  name: true,
+                }
+              }
+            }
           }
         }
       });
@@ -152,6 +165,7 @@ export default async function handler(
           methodId,
           addressId,
           customerId,
+          payment,
           ...data
         } = req.body;
         const orderItemData =  orderItems.map((item) => ({
@@ -165,6 +179,11 @@ export default async function handler(
         const method = await prisma.shippingMethod.findUnique({
           where: {
             id: methodId
+          }
+        });
+        const paymentMethod = await prisma.paymentMethod.findUnique({
+          where: {
+            id: payment.methodId
           }
         });
 
@@ -184,40 +203,72 @@ export default async function handler(
             type: true,
           }
         });
-        const response = await prisma.order.create({
-          data: {
-            ...data,
-            company: {
-              connect: {
-                id: companyId
-              }
-            },
-            customer: {
-              connect: {
-                id: customerId
-              }
-            },
-            // sum subtotal of orderItems
-            totalAmount: orderItemData.reduce((acc, item) => acc + item.subtotal, 0),
-            orderItems: {
-              create: orderItemData
-            },
-            Shipping: {
-              create: {
-                method: {
-                  connect: {
-                    id: methodId
+        const totalAmount = orderItemData.reduce((acc, item) => acc + item.subtotal, 0);
+        const [createdOrder] = await prisma.$transaction([
+          prisma.order.create({
+            data: {
+              ...data,
+              company: {
+                connect: {
+                  id: companyId
+                }
+              },
+              customer: {
+                connect: {
+                  id: customerId
+                }
+              },
+              // sum subtotal of orderItems
+              totalAmount: orderItemData.reduce((acc, item) => acc + item.subtotal, 0),
+              orderItems: {
+                create: orderItemData
+              },
+              Shipping: {
+                create: {
+                  method: {
+                    connect: {
+                      id: methodId
+                    }
+                  },
+                  cost: method.cost,
+                  address: {
+                    create: address
                   }
-                },
-                cost: method.cost,
-                address: {
-                  create: address
+                }
+              },
+              Payment: {
+                create: {
+                  method: {
+                    connect: {
+                      id: payment.methodId
+                    }
+                  },
+                  costType: paymentMethod.costType,
+                  cost: paymentMethod.cost,
+                  amount: totalAmount,
+                  status: payment.status
                 }
               }
+            },
+            select: {
+              id: true,
+              totalAmount: true
             }
-          }
-        })
-        res.status(200).json(response);
+          }),
+          ...orderItemData.map((item) => prisma.product.update({
+            where: {
+              id: item.productId
+            },
+            data: {
+              unit: {
+                decrement: item.quantity
+              }
+            }
+          }))
+        ]);
+
+
+        res.status(200).json(createdOrder);
         return
       }
 

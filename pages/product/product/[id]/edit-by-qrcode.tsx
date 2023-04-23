@@ -13,6 +13,8 @@ import {
   Grid,
   Tabs,
   Tab,
+  Accordion,
+  AccordionSummary,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
@@ -21,8 +23,10 @@ import { toast } from "react-toastify";
 import { string, object, number, array } from "yup";
 import useSWR from "swr";
 import ImageForm, { imageSchema } from "components/ImageForm";
+import { Delete, ExpandMore } from "@mui/icons-material";
 import Dropzone from "components/Dropzone";
 import supabase from "lib/supabase";
+import SimpleMobileLayout from "components/SimpleMobileLayout";
 
 const defaultValues = {
   type: "P" as "P" | "S",
@@ -44,16 +48,21 @@ export const schema = object().shape({
   type: string().oneOf(["P", "S"]).required("required"),
   name: string().required("required"),
   description: string().optional(),
-  unit: number().when("type", {
+  currentUnit: number().when("type", {
     is: "P",
     then: (schema) => schema.positive().required("required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  unit: number().when("type", {
+    is: "P",
+    then: (schema) => schema.required("required"),
     otherwise: (schema) => schema.optional(),
   }),
   price: number().positive().required("required"),
   categoryId: string().optional(),
   supplierId: string().when("type", {
     is: "P",
-    then: (schema) => schema.optional(),
+    then: (schema) => schema.optional().nullable(),
     otherwise: (schema) => schema.optional().nullable(),
   }),
   status: string().required("required"),
@@ -68,11 +77,14 @@ const getItem = async (id: string) => {
 };
 
 const upsertItem = async (id: string, item: FormData) => {
-  const response = await axiosClient.post(`/api/product/${id}`, item);
+  const response = await axiosClient.post(
+    `/api/product/${id}/adjust-unit`,
+    item
+  );
   return response.data;
 };
 
-const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
+const QRProductForm = ({ snapshot }: { snapshot?: FormData }) => {
   const router = useRouter();
 
   const {
@@ -101,17 +113,18 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
     setValue,
     formState: { errors, isDirty, isValid, isSubmitting },
   } = methods;
+  console.log("errors: ", errors);
   const [isLoading, setIsLoading] = useState(false);
   const { type, supplierId } = methods.watch();
 
   useEffect(() => {
-    if (!isNew && !snapshot) {
+    if (!isNew && !snapshot && id) {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
           const item = await getItem(id as string);
           if (item) {
-            reset(item);
+            reset({ ...item, unit: 0, currentUnit: item.unit });
           }
         } catch (err) {
           toast.error("Error fetching product");
@@ -122,7 +135,7 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
 
       fetchItem();
     }
-  }, [isNew]);
+  }, [isNew, id]);
 
   const handleFile = async (file) => {
     const data = await supabase.storage
@@ -139,7 +152,8 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
     try {
       setIsLoading(true);
       const response = await upsertItem(id as string, data);
-      router.push("/product/product");
+      console.log("response: ", response);
+      reset({ ...response, unit: 0, currentUnit: response.unit });
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
       toast.error(isNew ? t("created-error") : "updated-error");
@@ -181,84 +195,39 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
             <Typography>{t("name")}</Typography>
             <TextField
               {...register("name")}
+              disabled
               error={!!errors.name}
               helperText={errors.name?.message}
               fullWidth
             />
           </Stack>
-          <Stack spacing={1}>
-            <Typography>{t("description")}</Typography>
-            <TextField
-              multiline
-              {...register("description")}
-              error={!!errors.description}
-              helperText={errors.description?.message}
-              fullWidth
-            />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography>{t("price")}</Typography>
-            <TextField
-              type="number"
-              inputProps={{ min: 0 }}
-              {...register("price")}
-              error={!!errors.price}
-              helperText={errors.price?.message}
-              fullWidth
-            />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography>{t("category")}</Typography>
-            <FormControl fullWidth error={!!errors.categoryId}>
-              <Controller
-                control={methods.control}
-                name="categoryId"
-                render={({ field }) => (
-                  <Select {...field}>
-                    {productCategories.map((category) => (
-                      <MenuItem value={category.id} key={category.id}>
-                        {category.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
-          </Stack>
           {type === "P" && (
-            <>
-              <Stack spacing={1}>
-                <Typography>{t("unit")}</Typography>
-                <TextField
-                  type="number"
-                  inputProps={{ min: 0 }}
-                  {...register("unit")}
-                  error={!!errors.unit}
-                  helperText={errors.unit?.message}
-                  fullWidth
-                />
-              </Stack>
-              <Stack spacing={1}>
-                <Typography>{t("supplier")}</Typography>
-                <FormControl fullWidth error={!!errors.supplierId}>
-                  <Controller
-                    control={methods.control}
-                    name="supplierId"
-                    render={({ field }) => (
-                      <Select {...field}>
-                        {suppliers.map((item) => (
-                          <MenuItem value={item.id} key={item.id}>
-                            {item.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    )}
-                  />
-                </FormControl>
-              </Stack>
-            </>
+            <Stack spacing={1}>
+              <Typography>{t("current-unit")}</Typography>
+              <TextField
+                type="number"
+                inputProps={{ min: 0 }}
+                {...register("currentUnit")}
+                disabled
+                error={!!errors.currentUnit}
+                helperText={errors.currentUnit?.message}
+                fullWidth
+              />
+            </Stack>
           )}
-          <Dropzone handleFile={handleFile} />
+          {type === "P" && (
+            <Stack spacing={1}>
+              <Typography>{t("add-unit")}</Typography>
+              <TextField
+                type="number"
+                inputProps={{ min: 0 }}
+                {...register("unit")}
+                error={!!errors.unit}
+                helperText={errors.unit?.message}
+                fullWidth
+              />
+            </Stack>
+          )}
           <LoadingButton
             type="submit"
             variant="contained"
@@ -266,12 +235,93 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
             disabled={!isDirty}
             onClick={handleSubmit(onSubmit)}
           >
-            {t(isNew ? "create" : "update")}
+            {t("update")}
           </LoadingButton>
+          <Accordion
+            sx={{
+              padding: "8px 16px",
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography variant="h6">{t("rest")}</Typography>
+            </AccordionSummary>
+            <Stack spacing={1}>
+              <Typography>{t("description")}</Typography>
+              <TextField
+                multiline
+                {...register("description")}
+                disabled
+                error={!!errors.description}
+                helperText={errors.description?.message}
+                fullWidth
+              />
+            </Stack>
+            <Stack spacing={1}>
+              <Typography>{t("price")}</Typography>
+              <TextField
+                type="number"
+                inputProps={{ min: 0 }}
+                {...register("price")}
+                disabled
+                error={!!errors.price}
+                helperText={errors.price?.message}
+                fullWidth
+              />
+            </Stack>
+            <Stack spacing={1}>
+              <Typography>{t("category")}</Typography>
+              <FormControl fullWidth error={!!errors.categoryId}>
+                <Controller
+                  control={methods.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <Select {...field} disabled>
+                      {productCategories.map((category) => (
+                        <MenuItem value={category.id} key={category.id}>
+                          {category.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </FormControl>
+            </Stack>
+            {type === "P" && (
+              <>
+                <Stack spacing={1}>
+                  <Typography>{t("supplier")}</Typography>
+                  <FormControl fullWidth error={!!errors.supplierId}>
+                    <Controller
+                      control={methods.control}
+                      name="supplierId"
+                      render={({ field }) => (
+                        <Select {...field} disabled>
+                          {suppliers.map((item) => (
+                            <MenuItem value={item.id} key={item.id}>
+                              {item.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </FormControl>
+                </Stack>
+              </>
+            )}
+          </Accordion>
+          {/* <Dropzone handleFile={handleFile} /> */}
         </Stack>
       </FormProvider>
     </Stack>
   );
 };
 
-export default ProductForm;
+QRProductForm.getLayout = (page) => (
+  <SimpleMobileLayout>{page}</SimpleMobileLayout>
+);
+
+export default QRProductForm;
