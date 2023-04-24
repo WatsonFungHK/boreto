@@ -47,6 +47,7 @@ export const menuItems = [
       },
     ],
   },
+  { label: "Quotation", icon: <OrdersIcon />, link: "/quotation" },
   { label: "Orders", icon: <OrdersIcon />, link: "/order" },
   { label: "supplier", icon: <SupplierIcon />, link: "/supplier" },
   {

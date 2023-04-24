@@ -11,43 +11,37 @@ export default async function handler(
 ) {
   try {
     if (req.method === 'GET') {
-      const response = await prisma.product.findUnique({
+       const response = await prisma.quotation.findUnique({
         where: {
-          id: req.query.id,
-        },
-        include: {
-          images: true,
-          category: true,
+          id: req.query.id as string,
         }
       });
       
+      console.log('response: ', response);
       res.status(200).json(response);
+      return;
     }
     if (req.method === 'POST') {
-      const session = await getSession()
       if (req.body.id) {
-        const { updated_at, created_at, ...data } = req.body;
-        const response = await prisma.product.update({
-          where: {
-            id: req.body.id,
+        const response = await prisma.quotation.update({
+          where: { id: req.body.id },
+          data: {
+            payload: req.body
           },
-          data: { ...data, id: req.body.id, companyId, },
         });
         res.status(200).json(response);
       } else {
-        const { updated_at, created_at, images, ...data } = req.body;
-        const response = await prisma.product.create({
+        const response = await prisma.quotation.create({
           data: {
-            ...data,
-            images: {
-              create: [...images]
-            },
+            payload: req.body,
             companyId,
           },
         });
-          
+
         res.status(200).json(response);
+        return
       }
+
     }
   } catch (error) {
     console.log('error: ', error);

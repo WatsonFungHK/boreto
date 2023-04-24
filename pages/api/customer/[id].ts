@@ -85,6 +85,7 @@ export default async function handler(
         response = await update(req, res)
       } else {
         const { updated_at, created_at, addresses, ...data } = req.body;
+        console.log('companyId: ', companyId);
         response = await prisma.customer.create({
           data: {
             ...data,

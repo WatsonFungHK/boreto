@@ -82,8 +82,6 @@ const generateCustomerOptions = (customers: any[]) => {
 
 const generateOrderItems = (orderItems: any[]) => {
   return orderItems.map(({ id, name, quantity, price, productId, type }) => {
-    console.log("name: ", name);
-    console.log("type: ", type);
     const products = generateProductOptions([{ id, name, price, type }]);
     return {
       productId,
