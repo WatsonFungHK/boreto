@@ -25,6 +25,7 @@ model User {
   office       Office?     @relation(fields: [officeId], references: [id])
   UserRole     UserRole[]
   AuditLog     AuditLog[]
+  Quotation    Quotation[]
 
   @@map(name: "users")
 }
@@ -396,13 +397,18 @@ model PaymentMethod {
 }
 
 model Quotation {
-  id        String    @id @default(cuid())
-  payload   Json
-  status    String    @default("A")
-  companyId String
-  company   Company   @relation(fields: [companyId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  id         String    @id @default(cuid())
+  payload    Json
+  externalId String
+  companyId  String
+  creatorId  String
+  creator    User      @relation(fields: [creatorId], references: [id])
+  status     String    @default("A")
+  company    Company   @relation(fields: [companyId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@unique([companyId, externalId])
 }
 
 model AuditLog {

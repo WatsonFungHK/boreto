@@ -14,7 +14,7 @@ const useProductOptions = (callback) => {
   const {
     data: { total, items: products } = { total: 0, items: [] },
     error,
-    // isLoading,
+    isLoading,
   } = useSWR(
     {
       url: "/api/product/all",
@@ -25,7 +25,7 @@ const useProductOptions = (callback) => {
     return callback(products);
   }, [products]);
 
-  return options;
+  return { options, isLoading, error};
 }
 
 export default useProductOptions

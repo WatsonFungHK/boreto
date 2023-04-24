@@ -44,6 +44,16 @@ const columns: Array<Column> = [
     },
   },
   {
+    label: "payment_status",
+    accessor: "Payment",
+    format: (value: any, row) => {
+      if (Array.isArray(value) && value.length > 0) {
+        return value[value.length - 1].status;
+      }
+      return undefined;
+    },
+  },
+  {
     label: "customer_name",
     accessor: "name",
     format: (value: any, row: any) =>

@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma';
 import cuid from 'cuid';
 import { getSession } from 'next-auth/react';
-import { companyId } from 'pages/api/constants'
+import { companyId, userId } from 'pages/api/constants'
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,7 +17,6 @@ export default async function handler(
         }
       });
       
-      console.log('response: ', response);
       res.status(200).json(response);
       return;
     }
@@ -33,8 +32,10 @@ export default async function handler(
       } else {
         const response = await prisma.quotation.create({
           data: {
+            externalId: req.body.externalId,
             payload: req.body,
             companyId,
+            creatorId: userId,
           },
         });
 

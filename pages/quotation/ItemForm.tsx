@@ -73,11 +73,17 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
     watch,
     formState: { errors: _errors },
   } = useFormContext();
-  const productOptions = useProductOptions(generateProductOptions);
+  const { options: productOptions, isLoading } = useProductOptions(
+    generateProductOptions
+  );
   const orderItems = useFieldArray({
     name: "orderItems",
     control,
   });
+
+  if (isLoading) {
+    return <Typography>Loading...</Typography>;
+  }
 
   return (
     <Stack
@@ -131,7 +137,6 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
           {orderItems.fields.map((orderItem, index) => {
             const fieldName = `orderItems.${index}`;
             const item = watch(`${fieldName}`);
-            console.log("item: ", item);
 
             const errors = _errors?.orderItems?.[index] || {};
             return (
@@ -142,63 +147,75 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
                 }}
               >
                 <TableCell>
-                  <IconButton
-                    sx={{
-                      position: "absolute",
-                      top: "4px",
-                      right: "-50px",
-                      backgroundColor: colors.grey20,
-                      "&:hover": {
-                        backgroundColor: colors.grey30,
-                      },
-                    }}
-                    onClick={() => orderItems.remove(index)}
-                  >
-                    <Remove />
-                  </IconButton>
-                  <Controller
-                    name={`${fieldName}.product`}
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        error={!!errors.product}
-                        displayEmpty
-                        placeholder={t("please-select")}
-                        disabled={readOnly}
-                        fullWidth
-                        onChange={(e) => {
-                          field.onChange(e);
-                          setValue(`${fieldName}.quantity`, 1);
-                          setValue(`${fieldName}.price`, e.target.value.price);
-                          setValue(
-                            `${fieldName}.subtotal`,
-                            e.target.value.price
-                          );
-                        }}
-                        sx={{
-                          "& .MuiSvgIcon-root": {
-                            display: "none",
-                          },
-                          fieldset: {
-                            border: "none",
-                          },
-                          "& .MuiSelect-select": {
-                            padding: 0,
-                          },
-                        }}
-                      >
-                        {productOptions.map((productOption) => (
-                          <MenuItem
-                            key={productOption.value}
-                            value={productOption}
-                          >
-                            {productOption.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    )}
-                  />
+                  {!readOnly && (
+                    <IconButton
+                      sx={{
+                        position: "absolute",
+                        top: "4px",
+                        right: "-50px",
+                        backgroundColor: colors.grey20,
+                        "&:hover": {
+                          backgroundColor: colors.grey30,
+                        },
+                      }}
+                      onClick={() => orderItems.remove(index)}
+                    >
+                      <Remove />
+                    </IconButton>
+                  )}
+                  {readOnly && <InputBase value={item.label} disabled />}
+                  {!readOnly && (
+                    <Controller
+                      name={`${fieldName}.product`}
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          error={!!errors.product}
+                          displayEmpty
+                          placeholder={t("please-select")}
+                          disabled={readOnly}
+                          fullWidth
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setValue(`${fieldName}.quantity`, 1);
+                            setValue(
+                              `${fieldName}.price`,
+                              e.target.value.price
+                            );
+                            setValue(
+                              `${fieldName}.subtotal`,
+                              e.target.value.price
+                            );
+                            setValue(
+                              `${fieldName}.label`,
+                              e.target.value.label
+                            );
+                          }}
+                          sx={{
+                            "& .MuiSvgIcon-root": {
+                              display: "none",
+                            },
+                            fieldset: {
+                              border: "none",
+                            },
+                            "& .MuiSelect-select": {
+                              padding: 0,
+                            },
+                          }}
+                        >
+                          {productOptions.map((productOption) => (
+                            <MenuItem
+                              key={productOption.value}
+                              value={productOption}
+                            >
+                              {productOption.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  )}
                 </TableCell>
                 <TableCell>
                   <InputBase
@@ -217,6 +234,7 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
                         textAlign: "right",
                       },
                     }}
+                    disabled={readOnly}
                   />
                 </TableCell>
                 <TableCell>
@@ -236,6 +254,7 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
                         textAlign: "right",
                       },
                     }}
+                    disabled={readOnly}
                   />
                 </TableCell>
                 <TableCell>
@@ -251,31 +270,39 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
                         }),
                       },
                     }}
+                    disabled={readOnly}
                   />
                 </TableCell>
                 <TableCell>
-                  <InputBase multiline fullWidth />
+                  <InputBase
+                    {...register(`${fieldName}.remark`)}
+                    multiline
+                    fullWidth
+                    disabled={readOnly}
+                  />
                 </TableCell>
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
-      <IconButton
-        onClick={() => orderItems.append({ id: cuid() })}
-        sx={{
-          position: "absolute",
-          bottom: "-20px",
-          right: "calc(50% - 20px)",
-          backgroundColor: colors.grey20,
-          boxShadow: "4px 4px 4px rgba(0, 0, 0, 0.25)",
-          "&:hover": {
-            backgroundColor: colors.grey30,
-          },
-        }}
-      >
-        <Add />
-      </IconButton>
+      {!readOnly && (
+        <IconButton
+          onClick={() => orderItems.append({ id: cuid() })}
+          sx={{
+            position: "absolute",
+            bottom: "-20px",
+            right: "calc(50% - 20px)",
+            backgroundColor: colors.grey20,
+            boxShadow: "4px 4px 4px rgba(0, 0, 0, 0.25)",
+            "&:hover": {
+              backgroundColor: colors.grey30,
+            },
+          }}
+        >
+          <Add />
+        </IconButton>
+      )}
     </Stack>
   );
 };

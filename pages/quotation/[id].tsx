@@ -6,7 +6,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { getDateString } from "utils/date";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
-import { array, number, object } from "yup";
+import { array, number, object, date, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useItems, getItem, upsertItem } from "lib/swr";
 import { useRouter } from "next/router";
@@ -16,6 +16,9 @@ import React, { useEffect, useState } from "react";
 const schema = object().shape({
   sum: number(),
   orderItems: array().of(orderItemSchema).required(),
+  externalId: string().required(),
+  quotationDate: string().required(),
+  effectiveDate: string().optional().nullable(),
 });
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
@@ -58,9 +61,7 @@ const FormContainer = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(`/api/quotation/${id}` as string, {
-        payload: data,
-      });
+      const response = await upsertItem(`/api/quotation/${id}`, data);
       router.push("/quotation");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
@@ -72,8 +73,8 @@ const FormContainer = () => {
 
   return (
     <FormProvider {...methods}>
-      <InfoForm />
-      <ItemForm />
+      <InfoForm readOnly={!isNew} />
+      <ItemForm readOnly={!isNew} />
       <Divider
         sx={{
           margin: "56px 0 0",
@@ -83,6 +84,7 @@ const FormContainer = () => {
       <LoadingButton
         type="submit"
         variant="contained"
+        loading={isLoading}
         onClick={methods.handleSubmit(onSubmit)}
       >
         {t("create")}

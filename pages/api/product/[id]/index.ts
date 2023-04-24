@@ -13,7 +13,7 @@ export default async function handler(
     if (req.method === 'GET') {
       const response = await prisma.product.findUnique({
         where: {
-          id: req.query.id,
+          id: req.query.id as string,
         },
         include: {
           images: true,
@@ -26,12 +26,17 @@ export default async function handler(
     if (req.method === 'POST') {
       const session = await getSession()
       if (req.body.id) {
-        const { updated_at, created_at, ...data } = req.body;
+        const { updated_at, created_at, categoryId, images, ...data } = req.body;
         const response = await prisma.product.update({
           where: {
             id: req.body.id,
           },
-          data: { ...data, id: req.body.id, companyId, },
+          data: {
+            ...data,
+            id: req.body.id,
+            companyId,
+            categoryId,
+          },
         });
         res.status(200).json(response);
       } else {

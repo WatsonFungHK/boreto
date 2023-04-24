@@ -32,6 +32,20 @@ const Detail = () => {
           targetModel={"Product"}
           targetId={id as string}
           SnapshotForm={Form}
+          renderRow={(item, index) => {
+            const { data, createdAt } = item;
+
+            if (data.unit.decrement) {
+              return (
+                <Stack key={item.id} spacing={1} direction="row" sx={{}}>
+                  {"Unit decrease "}
+                  {data.unit.decrement}
+                  {" because of order"}
+                </Stack>
+              );
+            }
+            return undefined;
+          }}
         />
       )}
       {value === 2 && <QRPage />}

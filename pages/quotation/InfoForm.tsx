@@ -8,6 +8,7 @@ import {
   Select,
   TableHead,
   TextField,
+  InputBase,
 } from "@mui/material";
 import useDynamicOptions from "hooks/useDynamicOptions";
 import { useFormContext } from "react-hook-form";
@@ -21,7 +22,7 @@ const generateCustomerOptions = (customers: any[]) => {
   }));
 };
 
-const InfoForm = () => {
+const InfoForm = ({ readOnly = false }) => {
   const {
     formState: { errors },
     watch,
@@ -52,29 +53,35 @@ const InfoForm = () => {
             <Typography>Customer</Typography>
           </TableCell>
           <TableCell>
-            <Select
-              value={customerId}
-              onChange={(e) => setValue("customerId", e.target.value)}
-              sx={{
-                "& .MuiSvgIcon-root": {
-                  display: "none",
-                },
-                fieldset: {
-                  borderColor: colors.grey30,
-                },
-                "& .MuiSelect-select": {
-                  padding: "4px 8px",
-                },
-              }}
-            >
-              {customerOptions.map(({ value, label }) => {
-                return (
-                  <MenuItem value={value} key={value}>
-                    {t(label)}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+            {!readOnly && <InputBase />}
+            {readOnly && (
+              <Select
+                value={customerId}
+                onChange={(e) => setValue("customerId", e.target.value)}
+                sx={{
+                  "& .MuiSvgIcon-root": {
+                    display: "none",
+                  },
+                  fieldset: {
+                    borderRadius: "0px",
+                    border: "none",
+                    borderBottom: "1px solid black",
+                  },
+                  "& .MuiSelect-select": {
+                    padding: "4px 8px",
+                  },
+                }}
+                fullWidth
+              >
+                {customerOptions.map(({ value, label }) => {
+                  return (
+                    <MenuItem value={value} key={value}>
+                      {t(label)}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            )}
           </TableCell>
           <TableCell>
             <Typography>Quotation Date</Typography>
@@ -89,12 +96,53 @@ const InfoForm = () => {
               InputProps={{
                 endAdornment: null,
               }}
+              disabled={readOnly}
               sx={{
                 input: {
                   padding: "4px 8px",
                   border: "none",
                 },
               }}
+            />
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell>
+            <Typography>Qoutation Id</Typography>
+          </TableCell>
+          <TableCell>
+            <InputBase
+              {...register("externalId")}
+              sx={{
+                input: {
+                  borderBottom: "1px solid black",
+                },
+              }}
+              fullWidth
+              disabled={readOnly}
+            />
+          </TableCell>
+          <TableCell>
+            <Typography>Effective Until</Typography>
+          </TableCell>
+          <TableCell>
+            <TextField
+              type="date"
+              {...register("effectiveDate")}
+              error={!!errors.quotationDate}
+              helperText={errors.quotationDate?.message}
+              fullWidth
+              InputProps={{
+                endAdornment: null,
+              }}
+              sx={{
+                input: {
+                  padding: "4px 8px",
+                  border: "none",
+                },
+              }}
+              disabled={readOnly}
             />
           </TableCell>
         </TableRow>

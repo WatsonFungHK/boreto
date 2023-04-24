@@ -16,12 +16,13 @@ const fetcher = async ({ url, filters }) => {
 
 const columns: Array<Column> = [
   {
-    label: "name",
-    accessor: "name",
+    label: "Quotation Id",
+    accessor: "payload.externalId",
   },
   {
-    label: "product_count",
-    accessor: "_count.products",
+    label: "Created date",
+    accessor: "createdAt",
+    format: (value) => new Date(value).toLocaleDateString(),
   },
 ];
 

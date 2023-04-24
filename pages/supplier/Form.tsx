@@ -32,10 +32,11 @@ export const schema = object().shape({
 const defaultValues = {
   name: "",
   contacts: [{}],
+  products: [],
   addresses: [{}],
 };
 
-export type FormData = ReturnType<typeof schema["cast"]>;
+export type FormData = ReturnType<(typeof schema)["cast"]>;
 
 const generateProductOptions = (products: any[]) => {
   return products.map(({ id, name }) => ({ value: id, label: name }));

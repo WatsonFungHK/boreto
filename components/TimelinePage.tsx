@@ -74,6 +74,54 @@ const TimelinePage = ({
     setOpen(true);
   };
 
+  const defaultRecord = (item, index) => {
+    const { user, action, createdAt, data } = item;
+    return (
+      <Stack
+        key={item.id}
+        spacing={1}
+        direction="row"
+        sx={{
+          fontSize: "16px",
+        }}
+      >
+        <Typography variant="body1" component={"span"}>
+          {user.first_name + " " + user.last_name}
+        </Typography>
+        <Typography variant="body1" component={"span"}>
+          {action}
+        </Typography>
+        <Typography variant="body1" component={"span"}>
+          {`on ${dayjs(createdAt).format("YYYY-MM-DD HH:mm")}`}
+        </Typography>
+        {SnapshotForm && (
+          <IconButton
+            size={"small"}
+            onClick={() => handleResetButtonClick(data)}
+          >
+            <Visibility
+              sx={{
+                width: "16px",
+                height: "16px",
+              }}
+            />
+          </IconButton>
+        )}
+      </Stack>
+    );
+  };
+
+  const getRecord = (item, index) => {
+    if (typeof renderRow === "function") {
+      const record = renderRow(item, index);
+      if (record) {
+        return record;
+      }
+    }
+
+    return defaultRecord(item, index);
+  };
+
   return (
     <Stack>
       <Timeline
@@ -99,7 +147,6 @@ const TimelinePage = ({
           </TimelineItem>
         )}
         {items.map((item, index) => {
-          const { user, action, createdAt, data } = item;
           return (
             <TimelineItem
               key={item.id}
@@ -111,43 +158,7 @@ const TimelinePage = ({
                 <TimelineDot />
                 {index !== items.length - 1 && <TimelineConnector />}
               </TimelineSeparator>
-              <TimelineContent>
-                {typeof renderRow === "function" ? (
-                  renderRow(item, index)
-                ) : (
-                  <Stack
-                    key={item.id}
-                    spacing={1}
-                    direction="row"
-                    sx={{
-                      fontSize: "16px",
-                    }}
-                  >
-                    <Typography variant="body1" component={"span"}>
-                      {user.first_name + " " + user.last_name}
-                    </Typography>
-                    <Typography variant="body1" component={"span"}>
-                      {action}
-                    </Typography>
-                    <Typography variant="body1" component={"span"}>
-                      {`on ${dayjs(createdAt).format("YYYY-MM-DD HH:mm")}`}
-                    </Typography>
-                    {SnapshotForm && (
-                      <IconButton
-                        size={"small"}
-                        onClick={() => handleResetButtonClick(data)}
-                      >
-                        <Visibility
-                          sx={{
-                            width: "16px",
-                            height: "16px",
-                          }}
-                        />
-                      </IconButton>
-                    )}
-                  </Stack>
-                )}
-              </TimelineContent>
+              <TimelineContent>{getRecord(item, index)}</TimelineContent>
             </TimelineItem>
           );
         })}

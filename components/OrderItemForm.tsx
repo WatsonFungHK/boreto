@@ -76,7 +76,9 @@ const OrderItemForm = ({
     getValues,
     formState: { errors: _errors },
   } = useFormContext();
-  const productOptions = useProductOptions(generateProductOptions);
+  const { options: productOptions, isLoading } = useProductOptions(
+    generateProductOptions
+  );
   const orderItems = useFieldArray({
     name: "orderItems",
     control,
