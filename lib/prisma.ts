@@ -16,7 +16,6 @@ if (process.env.NODE_ENV === 'production') {
 prisma.$use(async (params, next) => {
   // Your middleware logic goes here
   try {
-    console.log(params.action, params.model);
     const result = await next(params);
     
     if (

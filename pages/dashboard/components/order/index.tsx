@@ -2,20 +2,10 @@ import useSWR from "swr";
 import { fetcher } from "lib/swr";
 import { Grid, Stack, Typography, Card, CardContent } from "@mui/material";
 
-import React, { useEffect, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import colors from "theme/colors";
+import React from "react";
 import SalesBarChart from "./SalesBarChart";
 import BestSoldChart from "./BestProducts";
+import BestCategoryChart from "./BestCategories";
 
 interface AnalysisData {
   sumOfSales: number;
@@ -27,16 +17,6 @@ interface AnalysisData {
 }
 
 const Order = () => {
-  const { data, error } = useSWR<AnalysisData>(
-    {
-      url: "/api/analysis/order/total-sales",
-      query: {
-        quickFilter: "today",
-      },
-    },
-    fetcher
-  );
-
   return (
     <Stack>
       <Card>
@@ -45,6 +25,9 @@ const Order = () => {
           <Grid container>
             <Grid item xs={6}>
               <BestSoldChart />
+            </Grid>
+            <Grid item xs={6}>
+              <BestCategoryChart />
             </Grid>
             <Grid item xs={6}>
               <SalesBarChart />

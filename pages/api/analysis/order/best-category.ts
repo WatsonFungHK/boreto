@@ -9,32 +9,40 @@ export default async function handler(
 ) {
   try {
     if (req.method === 'GET') {
-      const aggregatedData = await prisma.orderItem.groupBy({
-        by: [
-          'productId',
-          {
-            categoryId: true,
-            category: {
-              id: true,
-              name: true,
+      const categories = await prisma.productCategory.findMany({
+        where: {
+          companyId,
+        },
+        include: {
+          products: {
+            select: {
+              OrderItem: true,
             },
           },
-        ],
-        _sum: {
-          quantity: true,
         },
       });
-      
-      const bestProductCategories = aggregatedData
-        .sort((a, b) => b._sum.quantity - a._sum.quantity)
-        .slice(0, 5)
-        .map((result) => ({
-          id: result.product.category.id,
-          name: result.product.category.name,
-          totalQuantity: result._sum.quantity,
-        }));
-      res.status(200).json({ items: bestProductCategories });
-      return;
+
+      const categoriesWithSoldAmount = categories.map((category) => {
+        let totalQuantity = 0;
+    
+        category.products.forEach((product) => {
+          product.OrderItem.forEach((orderItem) => {
+            totalQuantity += orderItem.quantity;
+          });
+        });
+    
+        return {
+          id: category.id,
+          name: category.name,
+          totalQuantity,
+        };
+      });
+
+      categoriesWithSoldAmount.sort(
+        (a, b) => b.totalQuantity - a.totalQuantity
+      );
+    
+      res.status(200).json({ items: categoriesWithSoldAmount })
     }
   } catch (error) {
     console.log('error: ', error);
