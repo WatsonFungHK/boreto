@@ -12,6 +12,7 @@ import {
   AccordionSummary,
   FormControl,
   Divider,
+  ListSubheader,
   FormHelperText,
 } from "@mui/material";
 import {
@@ -58,6 +59,7 @@ export const generateProductOptions = (productOptions) => {
       label: productOption.name,
       price: productOption.price,
       type: productOption.type,
+      category: productOption.category,
     };
   });
 };
@@ -216,11 +218,19 @@ const OrderItemForm = ({
                                 }}
                                 disabled={readOnly}
                               >
-                                {productOptions.map((option) => {
+                                {productOptions.map((option, index) => {
                                   return (
-                                    <MenuItem value={option} key={option.value}>
-                                      {option.label}
-                                    </MenuItem>
+                                    <Stack key={option.value}>
+                                      {productOptions[index - 1]?.category
+                                        ?.id !== option.category?.id && (
+                                        <ListSubheader>
+                                          {option.category?.name}
+                                        </ListSubheader>
+                                      )}
+                                      <MenuItem value={option}>
+                                        {option.label}
+                                      </MenuItem>
+                                    </Stack>
                                   );
                                 })}
                               </Select>

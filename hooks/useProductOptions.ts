@@ -22,7 +22,19 @@ const useProductOptions = (callback) => {
     fetcher
   );
   const options = useMemo(() => {
-    return callback(products);
+    const _products = products.sort((a, b) => {
+      const categoryNameA = a.category.name.toUpperCase();
+      const categoryNameB = b.category.name.toUpperCase();
+  
+      if (categoryNameA < categoryNameB) {
+        return -1;
+      }
+      if (categoryNameA > categoryNameB) {
+        return 1;
+      }
+      return 0;
+    });
+    return callback(_products);
   }, [products]);
 
   return { options, isLoading, error};
