@@ -9,6 +9,7 @@ import {
   TableHead,
   TextField,
   InputBase,
+  Divider,
 } from "@mui/material";
 import useDynamicOptions from "hooks/useDynamicOptions";
 import { useFormContext } from "react-hook-form";
@@ -31,6 +32,7 @@ const InfoForm = ({ readOnly = false }) => {
   } = useFormContext();
   const { t } = useTranslation();
   const customerId = watch("customerId");
+  const quotationDate = watch("quotationDate");
   const customerOptions = useDynamicOptions(
     "customer",
     generateCustomerOptions
@@ -41,13 +43,135 @@ const InfoForm = ({ readOnly = false }) => {
       <Table
         sx={{
           "& .MuiTableCell-root": {
-            padding: "8px 16px 8px 0",
+            padding: "8px 16px",
           },
           td: {
             borderBottom: "none",
           },
         }}
       >
+        <TableRow>
+          <TableCell>
+            <Typography>website</Typography>
+          </TableCell>
+          <TableCell>
+            <InputBase
+              value={customerId}
+              onChange={(e) => setValue("website", e.target.value)}
+            />
+          </TableCell>
+          <TableCell>
+            <Typography>Quotation Date</Typography>
+          </TableCell>
+          <TableCell>
+            <TextField
+              type="date"
+              {...register("quotationDate")}
+              error={!!errors.quotationDate}
+              helperText={errors.quotationDate?.message}
+              fullWidth
+              InputProps={{
+                endAdornment: null,
+              }}
+              disabled={readOnly}
+              sx={{
+                input: {
+                  padding: "4px 8px",
+                  border: "none",
+                },
+              }}
+            />
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell>
+            <Typography>{t("email-address")}</Typography>
+          </TableCell>
+          <TableCell>
+            <InputBase
+              value={customerId}
+              onChange={(e) => setValue("email", e.target.value)}
+            />
+          </TableCell>
+          <TableCell>
+            <Typography>Qoutation Id</Typography>
+          </TableCell>
+          <TableCell>
+            <InputBase
+              {...register("externalId")}
+              sx={{
+                input: {
+                  borderBottom: "1px solid black",
+                },
+              }}
+              fullWidth
+              disabled={readOnly}
+            />
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Typography>phone</Typography>
+          </TableCell>
+          <TableCell>
+            <InputBase
+              {...register("phone")}
+              sx={{
+                input: {
+                  borderBottom: "1px solid black",
+                },
+              }}
+              fullWidth
+              disabled={readOnly}
+            />
+          </TableCell>
+          <TableCell>
+            <Typography>Effective Until</Typography>
+          </TableCell>
+          <TableCell>
+            <TextField
+              type="date"
+              {...register("effectiveDate")}
+              error={!!errors.quotationDate}
+              helperText={errors.quotationDate?.message}
+              fullWidth
+              InputProps={{
+                endAdornment: null,
+                inputProps: {
+                  min: quotationDate,
+                },
+              }}
+              sx={{
+                input: {
+                  padding: "4px 8px",
+                  border: "none",
+                },
+              }}
+              disabled={readOnly}
+            />
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell
+            sx={{
+              backgroundColor: colors.blue70,
+              color: colors.white,
+            }}
+          >
+            <Typography>{t("payee")}</Typography>
+          </TableCell>
+          <TableCell />
+          <TableCell
+            sx={{
+              backgroundColor: colors.blue70,
+              color: colors.white,
+            }}
+          >
+            <Typography>{t("address")}</Typography>
+          </TableCell>
+          <TableCell />
+        </TableRow>
         <TableRow>
           <TableCell>
             <Typography>Customer</Typography>
@@ -86,65 +210,7 @@ const InfoForm = ({ readOnly = false }) => {
           <TableCell>
             <Typography>Quotation Date</Typography>
           </TableCell>
-          <TableCell>
-            <TextField
-              type="date"
-              {...register("quotationDate")}
-              error={!!errors.quotationDate}
-              helperText={errors.quotationDate?.message}
-              fullWidth
-              InputProps={{
-                endAdornment: null,
-              }}
-              disabled={readOnly}
-              sx={{
-                input: {
-                  padding: "4px 8px",
-                  border: "none",
-                },
-              }}
-            />
-          </TableCell>
-        </TableRow>
-
-        <TableRow>
-          <TableCell>
-            <Typography>Qoutation Id</Typography>
-          </TableCell>
-          <TableCell>
-            <InputBase
-              {...register("externalId")}
-              sx={{
-                input: {
-                  borderBottom: "1px solid black",
-                },
-              }}
-              fullWidth
-              disabled={readOnly}
-            />
-          </TableCell>
-          <TableCell>
-            <Typography>Effective Until</Typography>
-          </TableCell>
-          <TableCell>
-            <TextField
-              type="date"
-              {...register("effectiveDate")}
-              error={!!errors.quotationDate}
-              helperText={errors.quotationDate?.message}
-              fullWidth
-              InputProps={{
-                endAdornment: null,
-              }}
-              sx={{
-                input: {
-                  padding: "4px 8px",
-                  border: "none",
-                },
-              }}
-              disabled={readOnly}
-            />
-          </TableCell>
+          <TableCell>1</TableCell>
         </TableRow>
       </Table>
     </Stack>

@@ -22,7 +22,7 @@ import {
   TableBody,
   Modal,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useFieldArray,
   useForm,
@@ -80,6 +80,13 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
     name: "orderItems",
     control,
   });
+
+  const _orderItems = watch("orderItems");
+  const subtotal = _orderItems.reduce((acc, cur) => acc + cur.subtotal, 0);
+
+  useEffect(() => {
+    setValue("subtotal", subtotal);
+  }, [subtotal, setValue]);
 
   if (isLoading) {
     return <Typography>Loading...</Typography>;

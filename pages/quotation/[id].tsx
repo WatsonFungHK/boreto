@@ -12,6 +12,7 @@ import { useItems, getItem, upsertItem } from "lib/swr";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import React, { useEffect, useState } from "react";
+import TermsForm from "./TermsForm";
 
 const schema = object().shape({
   sum: number(),
@@ -81,6 +82,7 @@ const FormContainer = () => {
         }}
       />
       <MoneyForm />
+      <TermsForm readOnly={!isNew} />
       <LoadingButton
         type="submit"
         variant="contained"
