@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const accessToken = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
-        user.accessToken = accessToken;
+        // user.accessToken = accessToken;
 
         return user;
       },
@@ -61,32 +61,32 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  callbacks: {
-    async jwt({ token, account, user, profile, isNewUser }) {
-      console.log('isNewUser: ', isNewUser);
-      console.log('profile: ', profile);
-      console.log('user: ', user);
-      console.log('account: ', account);
-      // Persist the OAuth access_token to the token right after signin
-      if (user) {
-        token.accessToken = user.accessToken
-        token.companyId = user.companyId
-      }
-      return token
-    },
-    async session({ session, token, user }) {
-      console.log('session: ', session);
-      console.log('token: ', token);
-      // Send properties to the client, like an access_token from a provider.
-      session.accessToken = token.accessToken
-      session.user = {
-        ...session.user,
-        companyId: token.companyId
+  // callbacks: {
+  //   async jwt({ token, account, user, profile, isNewUser }) {
+  //     console.log('isNewUser: ', isNewUser);
+  //     console.log('profile: ', profile);
+  //     console.log('user: ', user);
+  //     console.log('account: ', account);
+  //     // Persist the OAuth access_token to the token right after signin
+  //     if (user) {
+  //       token.accessToken = user.accessToken
+  //       token.companyId = user.companyId
+  //     }
+  //     return token
+  //   },
+  //   async session({ session, token, user }) {
+  //     console.log('session: ', session);
+  //     console.log('token: ', token);
+  //     // Send properties to the client, like an access_token from a provider.
+  //     session.accessToken = token.accessToken
+  //     session.user = {
+  //       ...session.user,
+  //       companyId: token.companyId
 
-      }
-      return session
-    }
-  },
+  //     }
+  //     return session
+  //   }
+  // },
   pages: {
     signIn: "/login",
   }
