@@ -10,7 +10,7 @@ const fetcher = async ({ url, filters }) => {
 };
 
 
-const useStaffOptions = (callback) => {
+const useStaffOptions = (callback: (staff: unknown[]) => unknown[]) => {
   const {
     data: { total, items: staff } = { total: 0, items: [] },
     error,

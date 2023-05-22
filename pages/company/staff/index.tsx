@@ -7,7 +7,7 @@ import BasicTable from "components/BasicTable";
 import type { Column } from "components/BasicTable";
 import { useState } from "react";
 import DebouncedInput from "components/DebouncedInput";
-import { columns } from "./_constants";
+import { columns } from "../../../constants/staff";
 
 const fetcher = async ({ url, filters }) => {
   const queryParams = new URLSearchParams(filters).toString();

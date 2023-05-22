@@ -28,7 +28,7 @@ import useDynamicOptions from "hooks/useDynamicOptions";
 import { Visibility } from "@mui/icons-material";
 import colors from "theme/colors";
 import PaymentForm, { paymentSchema } from "components/PaymentForm";
-import ItemForm, { generateProductOptions } from "pages/quotation/ItemForm";
+import ItemForm, { generateProductOptions } from "components/ItemForm";
 
 export const schema = object().shape({
   isNew: boolean(),

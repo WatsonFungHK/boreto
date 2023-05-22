@@ -4,7 +4,7 @@ import { useState } from "react";
 import Form from "../Form";
 import TimelinePage from "components/TimelinePage";
 import colors from "theme/colors";
-import QRPage from "../QRPage";
+import QRPage from "../../../../components/QRPage";
 import { useTranslation } from "react-i18next";
 
 const Detail = () => {

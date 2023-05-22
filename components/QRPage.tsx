@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { getItem } from "lib/swr";
 import { useRef } from "react";
 import useSWR from "swr";
-import Form from "./Form";
+import Form from "../pages/product/product/Form";
 import { Button, Box, Stack, Typography } from "@mui/material";
 import { printPDF } from "utils/printPDF";
 import Image from "next/image";

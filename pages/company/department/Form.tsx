@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import { string, object, date, number, array } from "yup";
 import useSWR from "swr";
 import Autocomplete from "components/Autocomplete";
-import useStaffOptions from "../hooks/useStaffOptions";
+import useStaffOptions from "../../../hooks/useStaffOptions";
 
 // Define the schema for the form
 export const schema = object().shape({
@@ -45,7 +45,7 @@ const STATUS_OPTIONS = [
   { value: "D", label: "Deleted" },
 ];
 
-export type FormData = ReturnType<typeof schema["cast"]>;
+export type FormData = ReturnType<(typeof schema)["cast"]>;
 
 // Define the API endpoints for fetching and upserting data
 const getItem = async (id: string) => {

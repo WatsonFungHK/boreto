@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import { string, object, array } from "yup";
 import AddressForm, { addressSchema } from "components/AddressForm";
 import Autocomplete from "components/Autocomplete";
-import useStaffOptions from "../hooks/useStaffOptions";
+import useStaffOptions from "../../../hooks/useStaffOptions";
 
 const defaultValues = {
   name: "",
@@ -40,7 +40,7 @@ export const schema = object().shape({
   users: array(),
 });
 
-export type FormData = ReturnType<typeof schema["cast"]>;
+export type FormData = ReturnType<(typeof schema)["cast"]>;
 
 const getItem = async (id: string) => {
   const response = await axiosClient.get(`/api/office/${id}`);

@@ -32,7 +32,7 @@ import { Visibility } from "@mui/icons-material";
 import AddressDisplay, { formatAddress } from "components/AddressDisplay";
 import { ContentCopy } from "@mui/icons-material";
 import PaymentForm from "components/PaymentForm";
-import ItemForm from "pages/quotation/ItemForm";
+import ItemForm from "components/ItemForm";
 
 const ShippingStatus = {
   PENDING: "PENDING",

@@ -1,7 +1,7 @@
 import { Divider, Stack } from "@mui/material";
-import ItemForm, { orderItemSchema } from "./ItemForm";
-import InfoForm from "./InfoForm";
-import MoneyForm from "./MoneyForm";
+import ItemForm, { orderItemSchema } from "../../components/ItemForm";
+import InfoForm from "../../components/InfoForm";
+import MoneyForm from "../../components/MoneyForm";
 import { useForm, FormProvider } from "react-hook-form";
 import { getDateString } from "utils/date";
 import { LoadingButton } from "@mui/lab";
@@ -12,7 +12,7 @@ import { useItems, getItem, upsertItem } from "lib/swr";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import React, { useEffect, useState } from "react";
-import TermsForm from "./TermsForm";
+import TermsForm from "../../components/TermsForm";
 
 const schema = object().shape({
   sum: number(),
