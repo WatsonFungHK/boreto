@@ -138,7 +138,7 @@ const QRProductForm = ({ snapshot }: { snapshot?: FormData }) => {
   }, [isNew, id]);
 
   const handleFile = async (file) => {
-    const data = await supabase.storage
+    const { data } = await supabase.storage
       .from("product-image")
       .upload(file.name, file);
     await supabase.from("product-image").insert({

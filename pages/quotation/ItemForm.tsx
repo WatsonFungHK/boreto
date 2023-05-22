@@ -59,6 +59,7 @@ export const generateProductOptions = (productOptions) => {
       label: productOption.name,
       price: productOption.price,
       type: productOption.type,
+      category: productOption.category,
     };
   });
 };

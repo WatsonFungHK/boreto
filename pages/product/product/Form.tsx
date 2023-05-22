@@ -131,7 +131,7 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
     await supabase.from("product-image").insert({
       productId: id as string,
       name: file.name,
-      url: `https://jsxhhyfhmmrlusumnxbq.supabase.co/storage/v1/object/public/product-image/${data.path}`,
+      url: `https://jsxhhyfhmmrlusumnxbq.supabase.co/storage/v1/object/public/product-image/${data.data.path}`,
     });
   };
 

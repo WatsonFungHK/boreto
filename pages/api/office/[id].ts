@@ -66,7 +66,7 @@ export default async function handler(
     if (req.method === 'GET') {
        const response = await prisma.office.findUnique({
         where: {
-          id: req.query.id,
+          id: req.query.id as string,
         },
         include: {
           addresses: {

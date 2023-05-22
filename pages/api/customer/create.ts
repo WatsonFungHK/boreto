@@ -2,17 +2,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma'
 import { getServerSession } from 'next-auth/next';
+import { companyId } from 'pages/api/constants'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    console.log('session: ', session);
     const customer = await prisma.customer.create({
       data: {
         ...req.body,
-        companyId: session.user.companyId,
+        companyId
       },
     })
 

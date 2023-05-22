@@ -6,11 +6,21 @@ import OrderHistory from "./_orderHistory";
 import TimelinePage from "components/TimelinePage";
 import colors from "theme/colors";
 
+interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  _count: {
+    Order: number;
+  };
+}
+
 const Customer = () => {
   const { query } = useRouter();
   const { id } = query;
   const [value, setValue] = useState(0);
-  const [customer, setCustomer] = useState({});
+  const [customer, setCustomer] = useState<Customer>(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

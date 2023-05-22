@@ -21,7 +21,7 @@ export default async function handler(
     }) : [];
     const whereClause = {
       companyId,
-      ...(customerId && { customerId }),
+      ...(customerId && { customerId: customerId as string }),
       NOT: {
         status: 'D'
       },

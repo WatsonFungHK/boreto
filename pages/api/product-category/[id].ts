@@ -13,7 +13,7 @@ export default async function handler(
     if (req.method === 'GET') {
       const response = await prisma.productCategory.findUnique({
         where: {
-          id: req.query.id
+          id: req.query.id as string
         },
         include: {
           products: true
