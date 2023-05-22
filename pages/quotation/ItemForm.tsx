@@ -21,6 +21,7 @@ import {
   TableCell,
   TableBody,
   Modal,
+  ListSubheader,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
@@ -170,7 +171,12 @@ const ItemForm = ({ multiple = true, readOnly = false }) => {
                       <Remove />
                     </IconButton>
                   )}
-                  {readOnly && <InputBase value={item.label} disabled />}
+                  {readOnly && (
+                    <InputBase
+                      value={item.label || item.product?.label}
+                      disabled
+                    />
+                  )}
                   {!readOnly && (
                     <Controller
                       name={`${fieldName}.product`}

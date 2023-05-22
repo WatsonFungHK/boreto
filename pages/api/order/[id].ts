@@ -173,7 +173,7 @@ export default async function handler(
           name: item.product.label,
           quantity: item.quantity,
           price: item.price,
-          subtotal: item.quantity * item.price,
+          subtotal: item.subtotal
         }));
 
         const method = await prisma.shippingMethod.findUnique({

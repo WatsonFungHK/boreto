@@ -32,6 +32,7 @@ import { Visibility } from "@mui/icons-material";
 import AddressDisplay, { formatAddress } from "components/AddressDisplay";
 import { ContentCopy } from "@mui/icons-material";
 import PaymentForm from "components/PaymentForm";
+import ItemForm from "pages/quotation/ItemForm";
 
 const ShippingStatus = {
   PENDING: "PENDING",
@@ -93,6 +94,7 @@ export const schema = object().shape({
       }),
       quantity: number().required("required"),
       price: number().required("required"),
+      subtotal: number().required("required"),
     })
   ),
   methodId: string().required("required"),
@@ -143,15 +145,18 @@ const generateCustomerOptions = (customers: any[]) => {
 };
 
 const generateOrderItems = (orderItems: any[]) => {
-  return orderItems.map(({ id, name, quantity, price, productId }) => {
-    const products = generateProductOptions([{ id, name, price }]);
-    return {
-      productId,
-      product: products[0],
-      quantity,
-      price,
-    };
-  });
+  return orderItems.map(
+    ({ id, name, quantity, price, productId, subtotal }) => {
+      const products = generateProductOptions([{ id, name, price }]);
+      return {
+        productId,
+        product: products[0],
+        quantity,
+        price,
+        subtotal,
+      };
+    }
+  );
 };
 
 const OrderDetail = ({}: {}) => {
@@ -342,7 +347,7 @@ const OrderDetail = ({}: {}) => {
                             <Typography variant="body2">
                               Order snapshot address saves the delivery address
                               during order placement, ensuring accurate delivery
-                              information even if the customer's address
+                              information even if the customer&apos;s address
                               changes.
                             </Typography>
                             <TextField
@@ -490,7 +495,8 @@ const OrderDetail = ({}: {}) => {
               </Card>
             );
           })}
-          <OrderItemForm readOnly={!isNew} defaultExpanded />
+          {/* <OrderItemForm readOnly={!isNew} defaultExpanded /> */}
+          <ItemForm readOnly />
         </Stack>
       </FormProvider>
     </Stack>

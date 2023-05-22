@@ -19,15 +19,16 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { string, object, number, array, boolean } from "yup";
-import OrderItemForm, {
-  generateProductOptions,
-} from "components/OrderItemForm";
+// import OrderItemForm, {
+//   generateProductOptions,
+// } from "components/OrderItemForm";
 import AddressPicker from "components/AddressPicker";
 import { useItems, getItem, upsertItem } from "lib/swr";
 import useDynamicOptions from "hooks/useDynamicOptions";
 import { Visibility } from "@mui/icons-material";
 import colors from "theme/colors";
 import PaymentForm, { paymentSchema } from "components/PaymentForm";
+import ItemForm from "pages/quotation/ItemForm";
 
 export const schema = object().shape({
   isNew: boolean(),
@@ -63,6 +64,7 @@ export const schema = object().shape({
     otherwise: (schema) => schema.nullable(),
   }),
   payment: paymentSchema,
+  subtotal: number(),
 });
 
 const defaultValues = {
@@ -168,7 +170,7 @@ const OrderForm = ({}: {}) => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const { isNew, ...payload } = data;
+      const { isNew, subtotal, ...payload } = data;
       const response = await upsertItem(`/api/order/${id}` as string, {
         ...payload,
       });
@@ -273,7 +275,8 @@ const OrderForm = ({}: {}) => {
                 {t("no-address-to-create-shipping")}
               </Typography>
             )}
-          <OrderItemForm readOnly={!isNew} defaultExpanded />
+          {/* <OrderItemForm readOnly={!isNew} defaultExpanded /> */}
+          <ItemForm />
           <Card>
             <CardContent>
               <PaymentForm />
