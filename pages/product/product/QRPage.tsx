@@ -54,7 +54,7 @@ const QRPage = () => {
         </Stack>
         <QRCodeSVG
           value={
-            `${process.env.NEXT_PUBLIC_FRONTEND_URL}/products/` +
+            `${window.location.origin}/products/` +
             router.query.id +
             "/edit-by-qrcode"
           }
