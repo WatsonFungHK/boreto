@@ -425,3 +425,11 @@ model AuditLog {
   status      String    @default("A")
   company     Company   @relation(fields: [companyId], references: [id])
 }
+
+// put HR schema start here
+
+// put HR schema end
+
+// put CRM schema start here
+
+// put CRM schema end
