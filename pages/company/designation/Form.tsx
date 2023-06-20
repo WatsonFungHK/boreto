@@ -38,20 +38,8 @@ export const schema = object().shape({
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
 
-const generateBenefitsOptions = (benefits = []) => {
-  if (benefits.length === 0) {
-    return [];
-  }
-  return benefits.map(({ id, first_name, last_name }) => {
-    return {
-      value: id,
-      label: first_name + " " + last_name,
-    };
-  });
-};
-
-const generateDepartmentOptions = (departments) => {
-  return departments.map(({ id, name }) => {
+const generateOptions = (options) => {
+  return options.map(({ id, name }) => {
     return {
       value: id,
       label: name,
@@ -94,10 +82,10 @@ const DesignationForm = ({}: {}) => {
           if (item) {
             reset({
               ...item,
-              benefits: generateBenefitsOptions(
+              benefits: generateOptions(
                 item.benefits.map(({ benefit }) => benefit)
               ),
-              department: generateDepartmentOptions(item.department),
+              department: generateOptions(item.department),
             });
           }
         } catch (err) {
@@ -156,14 +144,14 @@ const DesignationForm = ({}: {}) => {
           </Stack>
 
           <Autocomplete
-            options={generateBenefitsOptions(benefits)}
+            options={generateOptions(benefits)}
             name="benefits"
             subtitle="benefits"
           />
           <Autocomplete
-            options={generateDepartmentOptions(departments)}
-            name="departments"
-            subtitle="departments"
+            options={generateOptions(departments)}
+            name="department"
+            subtitle="department"
           />
           {!isNew && (
             <Stack spacing={1}>

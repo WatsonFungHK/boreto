@@ -11,6 +11,7 @@ import {
   Typography,
   Grid,
 } from "@mui/material";
+import Autocomplete from "components/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
@@ -29,10 +30,20 @@ export const schema = object().shape({
   name: string().required("required"),
   description: string().optional(),
   designation: array(),
+  staff: array(),
   status: string().required("required"),
 });
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
+
+const generateOptions = (options) => {
+  return options.map(({ id, name }) => {
+    return {
+      value: id,
+      label: name,
+    };
+  });
+};
 
 const BenefitForm = () => {
   const router = useRouter();
@@ -54,6 +65,11 @@ const BenefitForm = () => {
     formState: { errors },
   } = methods;
   const [isLoading, setIsLoading] = useState(false);
+  const { data: { items: staff } = { total: 0, items: [] } } =
+    useItems("/api/staff/all");
+  const { data: { items: designation } = { total: 0, items: [] } } = useItems(
+    "/api/designation/all"
+  );
 
   useEffect(() => {
     if (!isNew) {
@@ -119,6 +135,16 @@ const BenefitForm = () => {
               fullWidth
             />
           </Stack>
+          <Autocomplete
+            options={generateOptions(staff)}
+            name="staff"
+            subtitle="staff"
+          />
+          <Autocomplete
+            options={generateOptions(designation)}
+            name="designation"
+            subtitle="designation"
+          />
 
           {!isNew && (
             <Stack>
