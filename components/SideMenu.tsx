@@ -72,6 +72,11 @@ export const menuItems = [
         link: "/company/staff",
       },
       {
+        label: "designation",
+        icon: <AssignmentInd />,
+        link: "/company/designation",
+      },
+      {
         label: "role",
         icon: <AssignmentInd />,
         link: "/company/role",
