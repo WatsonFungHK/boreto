@@ -53,6 +53,7 @@ model Department {
   created_at  DateTime  @default(now())
   updated_at  DateTime? @updatedAt
   users       User[]
+  designation Designation[]
 }
 
 model Address {
@@ -450,7 +451,10 @@ model Benefit {
 model Designation {
   id         String    @id @default(cuid())
   name       String    @unique
+  description String 
   status     String    @default("A")
+  DepartmentId String 
+  Department Department  @relation(fields: [DepartmentId], references: [id])
   createdAt  DateTime  @default(now())
   updatedAt  DateTime?     @updatedAt
   Staff   Staff[]
