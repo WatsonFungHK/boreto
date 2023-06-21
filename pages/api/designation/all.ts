@@ -20,7 +20,6 @@ export default async function handler(
       };
     });
     const whereClause = {
-      companyId,
       NOT: {
         status: "D",
       },
@@ -54,6 +53,12 @@ export default async function handler(
           },
           Department: {
             select: {
+              name: true,
+            },
+          },
+          Benefit: {
+            select: {
+              id: true,
               name: true,
             },
           },

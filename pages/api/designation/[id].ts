@@ -35,15 +35,8 @@ export default async function handler(
     }
     if (req.method === "POST") {
       const session = await getSession();
-      const {
-        updated_at,
-        created_at,
-        benefits,
-        departmentId,
-        department,
-        id,
-        ...data
-      } = req.body;
+      const { updated_at, created_at, benefits, departmentId, id, ...data } =
+        req.body;
 
       if (!id) {
         const createdDesignation = await prisma.designation.create({
@@ -68,18 +61,15 @@ export default async function handler(
         const updatedDesignation = await prisma.designation.update({
           where: { id },
           data: {
-            ...data,
-            companyId,
+            name: data.name,
+            description: data.description,
+            status: data.status,
             Benefit: {
               connect: benefits?.map((benefitId) => ({
                 Benefit: { connect: { id: benefitId } },
               })),
             },
-            Department: {
-              connect: {
-                id: departmentId,
-              },
-            },
+            ...(departmentId && { DepartmentId: departmentId }),
           },
         });
         res.status(200).json(updatedDesignation);

@@ -85,9 +85,9 @@ const DesignationForm = ({}: {}) => {
           if (item) {
             reset({
               ...item,
-              benefits: generateOptions(
-                item.benefits.map(({ benefit }) => benefit)
-              ),
+              // benefits: generateOptions(
+              //   item.benefits.map(({ benefit }) => benefit)
+              // ),
             });
           }
         } catch (err) {
@@ -152,8 +152,8 @@ const DesignationForm = ({}: {}) => {
           />
           <Autocomplete
             options={generateOptions(departments)}
-            name="departments"
-            subtitle="departments"
+            name="departmentId"
+            subtitle="departmentId"
           />
           {!isNew && (
             <Stack spacing={1}>
