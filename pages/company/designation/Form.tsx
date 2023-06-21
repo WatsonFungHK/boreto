@@ -25,20 +25,23 @@ const defaultValues = {
   description: "",
   status: "A", // 'A' = Active, 'I' = Inactive, 'D' = Deleted
   benefits: [],
-  department: "",
+  departmentId: "",
 };
 
 export const schema = object().shape({
   name: string().required("required"),
   description: string().optional(),
-  department: string().required("required"),
-  benefits: array(),
+  departmentId: string().optional(),
+  benefits: array().nullable(),
   status: string(),
 });
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
 
-const generateOptions = (options) => {
+const generateOptions = (options = []) => {
+  if (options.length === 0) {
+    return [];
+  }
   return options.map(({ id, name }) => {
     return {
       value: id,
@@ -82,10 +85,9 @@ const DesignationForm = ({}: {}) => {
           if (item) {
             reset({
               ...item,
-              benefits: generateOptions(
-                item.benefits.map(({ benefit }) => benefit)
-              ),
-              department: generateOptions(item.department),
+              // benefits: generateOptions(
+              //   item.benefits.map(({ benefit }) => benefit)
+              // ),
             });
           }
         } catch (err) {
@@ -104,8 +106,8 @@ const DesignationForm = ({}: {}) => {
       setIsLoading(true);
       const response = await upsertItem(`/api/designation/${id}`, {
         ...data,
-        benefits: data.benefits.map(({ value }) => value),
-        department: data.department,
+        benefits: data.benefits?.map(({ value }) => value) || [],
+        departmentId: data.departmentId,
       });
       router.push("/company/designation");
       toast.success(isNew ? t("created-success") : "updated-success");
@@ -150,8 +152,8 @@ const DesignationForm = ({}: {}) => {
           />
           <Autocomplete
             options={generateOptions(departments)}
-            name="department"
-            subtitle="department"
+            name="departmentId"
+            subtitle="departmentId"
           />
           {!isNew && (
             <Stack spacing={1}>
