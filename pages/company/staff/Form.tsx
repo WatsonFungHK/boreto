@@ -25,12 +25,14 @@ export const schema = object().shape({
   last_name: string().optional(),
   gender: string().optional(),
   email: string().email().optional(),
+  status: string(),
   phone_number: string().optional(),
-  // departmentId: string().optional(),
-  // designationId: string().optional(),
-  // officeId: string().optional(),
+  departmentId: string().optional().nullable(),
+  designationId: string().optional().nullable(),
+  officeId: string().optional().nullable(),
   birth_date: string().optional().nullable(),
   joined_date: string().optional().nullable(),
+  promoted_date: string().optional().nullable(),
   addresses: array().of(
     object({
       line_1: string().required(),
@@ -48,11 +50,10 @@ const defaultValues = {
   first_name: "",
   last_name: "",
   gender: "",
+  status: "A",
   birth_date: getDateString(),
   joined_date: getDateString(),
-  // departmentId: "",
-  // designationId: "",
-  // officeId: "",
+  promoted_date: getDateString(),
 };
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
@@ -102,6 +103,11 @@ const Form = ({}: {}) => {
     isLoading: isLoadingOffices,
   } = useSWR("/api/office/all", fetcher);
 
+  const {
+    data: { items: designations } = { items: [] },
+    isLoading: isLoadingDesignation,
+  } = useSWR("/api/designation/all", fetcher);
+
   const methods = useForm<FormData>({
     defaultValues,
     resolver: yupResolver(schema),
@@ -115,7 +121,7 @@ const Form = ({}: {}) => {
     control,
     formState: { errors },
   } = methods;
-  const { gender, officeId, departmentId } = watch();
+  const { gender, officeId, departmentId, designationId } = watch();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -186,6 +192,44 @@ const Form = ({}: {}) => {
             </Grid>
             <Grid item xs={6}>
               <Stack spacing={1}>
+                <Typography>{t("gender")}</Typography>
+                <FormControl fullWidth error={!!errors.gender}>
+                  <Select
+                    value={gender}
+                    onChange={(e) => setValue("gender", e.target.value)}
+                  >
+                    {GENDERS.map(({ value, label }) => {
+                      return (
+                        <MenuItem value={value} key={value}>
+                          {t(label)}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("status")}</Typography>
+                <FormControl fullWidth error={!!errors.status}>
+                  <Select
+                    value={status}
+                    onChange={(e) => setValue("status", e.target.value)}
+                  >
+                    {STATUSES.map(({ value, label }) => {
+                      return (
+                        <MenuItem value={value} key={value}>
+                          {t(label)}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
                 <Typography>{t("email")}</Typography>
                 <TextField
                   {...register("email")}
@@ -232,6 +276,18 @@ const Form = ({}: {}) => {
             </Grid>
             <Grid item xs={6}>
               <Stack spacing={1}>
+                <Typography>{t("promoted_date")}</Typography>
+                <TextField
+                  type="date"
+                  {...register("promoted_date")}
+                  error={!!errors.promoted_date}
+                  helperText={errors.promoted_date?.message}
+                  fullWidth
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
                 <Typography>{t("office")}</Typography>
                 <FormControl fullWidth error={!!errors.officeId}>
                   <Controller
@@ -243,6 +299,33 @@ const Form = ({}: {}) => {
                         onChange={(e) => setValue("officeId", e.target.value)}
                       >
                         {offices.map(({ id, name }) => {
+                          return (
+                            <MenuItem value={id} key={id}>
+                              {t(name)}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("designation")}</Typography>
+                <FormControl fullWidth error={!!errors.designationId}>
+                  <Controller
+                    control={control}
+                    name="designationId"
+                    render={({ field }) => (
+                      <Select
+                        value={designationId}
+                        onChange={(e) =>
+                          setValue("designationId", e.target.value)
+                        }
+                      >
+                        {designations.map(({ id, name }) => {
                           return (
                             <MenuItem value={id} key={id}>
                               {t(name)}
