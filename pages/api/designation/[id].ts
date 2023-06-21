@@ -35,24 +35,32 @@ export default async function handler(
     }
     if (req.method === "POST") {
       const session = await getSession();
-      const { updated_at, created_at, benefit, department, id, ...data } =
-        req.body;
+      const {
+        updated_at,
+        created_at,
+        benefits,
+        departmentId,
+        department,
+        id,
+        ...data
+      } = req.body;
 
       if (!id) {
         const createdDesignation = await prisma.designation.create({
           data: {
             ...data,
-            companyId,
             Benefit: {
-              connect: benefit.map((BenefitId) => ({
-                Benefit: { connect: { id: BenefitId } },
+              connect: benefits?.map((benefit) => ({
+                Benefit: { connect: { id: benefit.id } },
               })),
             },
-            Department: {
-              connect: department.map((departmentId) => ({
-                department: { connect: { id: departmentId } },
-              })),
-            },
+            ...(departmentId && {
+              Department: {
+                connect: {
+                  id: departmentId,
+                },
+              },
+            }),
           },
         });
         res.status(200).json(createdDesignation);
@@ -61,15 +69,16 @@ export default async function handler(
           where: { id },
           data: {
             ...data,
+            companyId,
             Benefit: {
-              connect: benefit.map((BenefitId) => ({
-                Benefit: { connect: { id: BenefitId } },
+              connect: benefits?.map((benefitId) => ({
+                Benefit: { connect: { id: benefitId } },
               })),
             },
             Department: {
-              connect: department.map((departmentId) => ({
-                department: { connect: { id: departmentId } },
-              })),
+              connect: {
+                id: departmentId,
+              },
             },
           },
         });

@@ -25,33 +25,24 @@ const defaultValues = {
   description: "",
   status: "A", // 'A' = Active, 'I' = Inactive, 'D' = Deleted
   benefits: [],
-  department: "",
+  departmentId: "",
 };
 
 export const schema = object().shape({
   name: string().required("required"),
   description: string().optional(),
-  department: string().required("required"),
-  benefits: array(),
+  departmentId: string().optional(),
+  benefits: array().nullable(),
   status: string(),
 });
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
 
-const generateBenefitsOptions = (benefits = []) => {
-  if (benefits.length === 0) {
+const generateOptions = (options = []) => {
+  if (options.length === 0) {
     return [];
   }
-  return benefits.map(({ id, first_name, last_name }) => {
-    return {
-      value: id,
-      label: first_name + " " + last_name,
-    };
-  });
-};
-
-const generateDepartmentOptions = (departments) => {
-  return departments.map(({ id, name }) => {
+  return options.map(({ id, name }) => {
     return {
       value: id,
       label: name,
@@ -94,10 +85,9 @@ const DesignationForm = ({}: {}) => {
           if (item) {
             reset({
               ...item,
-              benefits: generateBenefitsOptions(
+              benefits: generateOptions(
                 item.benefits.map(({ benefit }) => benefit)
               ),
-              department: generateDepartmentOptions(item.department),
             });
           }
         } catch (err) {
@@ -116,8 +106,8 @@ const DesignationForm = ({}: {}) => {
       setIsLoading(true);
       const response = await upsertItem(`/api/designation/${id}`, {
         ...data,
-        benefits: data.benefits.map(({ value }) => value),
-        department: data.department,
+        benefits: data.benefits?.map(({ value }) => value) || [],
+        departmentId: data.departmentId,
       });
       router.push("/company/designation");
       toast.success(isNew ? t("created-success") : "updated-success");
@@ -156,12 +146,12 @@ const DesignationForm = ({}: {}) => {
           </Stack>
 
           <Autocomplete
-            options={generateBenefitsOptions(benefits)}
+            options={generateOptions(benefits)}
             name="benefits"
             subtitle="benefits"
           />
           <Autocomplete
-            options={generateDepartmentOptions(departments)}
+            options={generateOptions(departments)}
             name="departments"
             subtitle="departments"
           />

@@ -444,7 +444,7 @@ model Benefit {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime?     @updatedAt
   Staff         Staff[]       @relation("EligibleStaff")
-  designationId String
+  designationId String?
   Designation   Designation[] @relation("BenefitForDesignation")
 }
 
@@ -453,8 +453,8 @@ model Designation {
   name       String    @unique
   description String 
   status     String    @default("A")
-  DepartmentId String 
-  Department Department  @relation(fields: [DepartmentId], references: [id])
+  DepartmentId String? 
+  Department Department?  @relation(fields: [DepartmentId], references: [id])
   createdAt  DateTime  @default(now())
   updatedAt  DateTime?     @updatedAt
   Staff   Staff[]
