@@ -23,11 +23,12 @@ import useSWR from "swr";
 export const schema = object().shape({
   first_name: string().required("required"),
   last_name: string().optional(),
-  nick_name: string().optional(),
   gender: string().optional(),
   email: string().email().optional(),
   phone_number: string().optional(),
-  departmentId: string().optional(),
+  // departmentId: string().optional(),
+  // designationId: string().optional(),
+  // companyId: string(),
   officeId: string().optional(),
   birth_date: string().optional().nullable(),
   joined_date: string().optional().nullable(),
@@ -48,13 +49,15 @@ const defaultValues = {
   first_name: "",
   last_name: "",
   gender: "",
-  birth_date: undefined,
+  // companyId: "",
+  birth_date: getDateString(),
   joined_date: getDateString(),
-  departmentId: "",
-  officeId: "",
+  // departmentId: "",
+  // designationId: "",
+  // officeId: "",
 };
 
-export type FormData = ReturnType<typeof schema["cast"]>;
+export type FormData = ReturnType<(typeof schema)["cast"]>;
 
 const GENDERS = [
   { value: "M", label: "male" },
@@ -277,17 +280,7 @@ const Form = ({}: {}) => {
               </Stack>
             </Grid>
           </Grid>
-          <Stack spacing={1}>
-            <Typography>{t("nick_name")}</Typography>
-            <TextField
-              type="text"
-              inputProps={{ min: 0 }}
-              {...register("nick_name")}
-              error={!!errors.nick_name}
-              helperText={errors.nick_name?.message}
-              fullWidth
-            />
-          </Stack>
+
           <AddressForm />
           <LoadingButton
             type="submit"
