@@ -63,9 +63,17 @@ export default async function handler(
         where: {
           id: req.query.id as string,
         },
+        include: {
+          addresses: {
+            where: {
+              status: "A",
+            },
+          },
+        },
       });
 
       res.status(200).json(response);
+      return;
     }
     if (req.method === "POST") {
       let response;

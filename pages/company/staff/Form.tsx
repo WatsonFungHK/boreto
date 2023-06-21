@@ -28,8 +28,7 @@ export const schema = object().shape({
   phone_number: string().optional(),
   // departmentId: string().optional(),
   // designationId: string().optional(),
-  // companyId: string(),
-  officeId: string().optional(),
+  // officeId: string().optional(),
   birth_date: string().optional().nullable(),
   joined_date: string().optional().nullable(),
   addresses: array().of(
@@ -49,7 +48,6 @@ const defaultValues = {
   first_name: "",
   last_name: "",
   gender: "",
-  // companyId: "",
   birth_date: getDateString(),
   joined_date: getDateString(),
   // departmentId: "",
