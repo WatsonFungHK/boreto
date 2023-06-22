@@ -20,7 +20,6 @@ export default async function handler(
       };
     });
     const whereClause = {
-      companyId,
       NOT: {
         status: "D",
       },
@@ -46,6 +45,14 @@ export default async function handler(
           updatedAt: "desc",
         },
         where: whereClause,
+        include: {
+          _count: {
+            select: {
+              Designation: true,
+              Staff: true,
+            },
+          },
+        },
       }),
     ]);
     res.status(200).json({ total, items });

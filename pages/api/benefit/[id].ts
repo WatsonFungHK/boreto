@@ -19,7 +19,8 @@ export default async function handler(
           Staff: {
             select: {
               id: true,
-              name: true,
+              first_name: true,
+              last_name: true,
             },
           },
           Designation: {
@@ -36,7 +37,7 @@ export default async function handler(
     if (req.method === "POST") {
       const session = await getSession();
       const id = req.body.id || cuid();
-      const { updated_at, created_at, staff, designation, ...data } = req.body;
+      const { updated_at, created_at, Staff, Designation, ...data } = req.body;
 
       let response;
       if (req.body.id) {
@@ -48,13 +49,13 @@ export default async function handler(
             ...data,
             id: req.body.id,
             Staff: {
-              connect: staff.map((StaffId) => ({
+              connect: Staff.map((StaffId) => ({
                 Benefit: { connect: { id: StaffId } },
               })),
             },
             Designation: {
-              connect: designation.map((designationId) => ({
-                designation: { connect: { id: designationId } },
+              connect: Designation.map((designation) => ({
+                id: designation.value,
               })),
             },
           },
@@ -64,12 +65,12 @@ export default async function handler(
           data: {
             ...data,
             Staff: {
-              connect: staff.map((StaffId) => ({
+              connect: Staff.map((StaffId) => ({
                 Benefit: { connect: { id: StaffId } },
               })),
             },
             Designation: {
-              connect: designation.map((designationId) => ({
+              connect: Designation.map((designationId) => ({
                 designation: { connect: { id: designationId } },
               })),
             },

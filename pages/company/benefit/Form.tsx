@@ -22,19 +22,32 @@ import { useItems, getItem, upsertItem } from "lib/swr";
 const defaultValues = {
   name: "",
   description: "",
-  designation: [],
+  Designation: [],
+  Staff: [],
   status: "A",
 };
 
 export const schema = object().shape({
   name: string().required("required"),
   description: string().optional(),
-  designation: array(),
-  staff: array(),
+  Designation: array().optional(),
+  Staff: array().optional(),
   status: string().required("required"),
 });
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
+
+const generateStaffOptions = (users = []) => {
+  if (users.length === 0) {
+    return [];
+  }
+  return users.map(({ id, first_name, last_name }) => {
+    return {
+      value: id,
+      label: first_name + " " + last_name,
+    };
+  });
+};
 
 const generateOptions = (options) => {
   return options.map(({ id, name }) => {
@@ -78,7 +91,11 @@ const BenefitForm = () => {
           setIsLoading(true);
           const item = await getItem(`/api/benefit/${id}`);
           if (item) {
-            reset(item);
+            reset({
+              ...item,
+              Staff: generateStaffOptions(staff),
+              Designation: generateOptions(designation),
+            });
           }
         } catch (err) {
           toast.error("Error fetching benefit");
@@ -136,13 +153,13 @@ const BenefitForm = () => {
             />
           </Stack>
           <Autocomplete
-            options={generateOptions(staff)}
-            name="staff"
+            options={generateStaffOptions(staff)}
+            name="Staff"
             subtitle="staff"
           />
           <Autocomplete
             options={generateOptions(designation)}
-            name="designation"
+            name="Designation"
             subtitle="designation"
           />
 
