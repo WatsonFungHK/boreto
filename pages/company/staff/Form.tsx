@@ -27,6 +27,8 @@ export const schema = object().shape({
   email: string().email().optional(),
   status: string(),
   phone_number: string().optional(),
+  basic_salary: number(),
+  employment_type: string().required("required"),
   departmentId: string().optional().nullable(),
   designationId: string().optional().nullable(),
   officeId: string().optional().nullable(),
@@ -51,6 +53,7 @@ const defaultValues = {
   last_name: "",
   gender: "",
   status: "A",
+  employment_type: "FT",
   birth_date: getDateString(),
   joined_date: getDateString(),
   promoted_date: getDateString(),
@@ -68,6 +71,11 @@ const STATUSES = [
   { value: "A", label: "active" },
   { value: "I", label: "inactive" },
   { value: "D", label: "deleted" },
+];
+
+const EMPLOYMENT_TYPE = [
+  { value: "FT", label: "full-time" },
+  { value: "PT", label: "part-time" },
 ];
 
 const getItem = async (id: string) => {
@@ -132,6 +140,7 @@ const Form = ({}: {}) => {
           setIsLoading(true);
           const item = await getItem(id as string);
           if (item) {
+            console.log({ item });
             reset({
               ...item,
             });
@@ -151,7 +160,7 @@ const Form = ({}: {}) => {
     try {
       setIsLoading(true);
       const response = await upsertItem(id as string, data);
-      router.push("/user");
+      router.push("/company/staff");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
       toast.error(isNew ? t("created-error") : "updated-error");
@@ -213,18 +222,24 @@ const Form = ({}: {}) => {
               <Stack spacing={1}>
                 <Typography>{t("status")}</Typography>
                 <FormControl fullWidth error={!!errors.status}>
-                  <Select
-                    value={status}
-                    onChange={(e) => setValue("status", e.target.value)}
-                  >
-                    {STATUSES.map(({ value, label }) => {
-                      return (
-                        <MenuItem value={value} key={value}>
-                          {t(label)}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
+                  <Controller
+                    control={control}
+                    name="status"
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        onChange={(e) => setValue("status", e.target.value)}
+                      >
+                        {STATUSES.map(({ label, value }) => {
+                          return (
+                            <MenuItem value={value} key={value}>
+                              {t(label)}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    )}
+                  />
                 </FormControl>
               </Stack>
             </Grid>
@@ -320,7 +335,7 @@ const Form = ({}: {}) => {
                     name="designationId"
                     render={({ field }) => (
                       <Select
-                        value={designationId}
+                        {...field}
                         onChange={(e) =>
                           setValue("designationId", e.target.value)
                         }
@@ -357,6 +372,37 @@ const Form = ({}: {}) => {
                       </Select>
                     )}
                   />
+                </FormControl>
+              </Stack>
+            </Grid>
+
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("employment-type")}</Typography>
+                <FormControl fullWidth error={!!errors.employment_type}>
+                  <Controller
+                    control={control}
+                    name="employment_type"
+                    render={({ field }) => (
+                      <Select {...field}>
+                        {EMPLOYMENT_TYPE.map(({ label, value }) => {
+                          return (
+                            <MenuItem value={value} key={value}>
+                              {t(label)}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("basic-salary")}</Typography>
+                <FormControl fullWidth error={!!errors.employment_type}>
+                  <TextField type="number" {...register("basic_salary")} />
                 </FormControl>
               </Stack>
             </Grid>

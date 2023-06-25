@@ -16,8 +16,12 @@ const fetcher = async ({ url, filters }) => {
 
 const columns: Array<Column> = [
   {
-    label: "Quotation Id",
-    accessor: "payload.externalId",
+    label: "Payslip Id",
+    accessor: "id",
+  },
+  {
+    label: "Staff",
+    accessor: "name",
   },
   {
     label: "Created date",
@@ -37,7 +41,7 @@ const TableContainer = () => {
     isLoading,
   } = useSWR(
     {
-      url: "/api/quotation/all",
+      url: "/api/payslip/all",
       filters: {
         pageNumber,
         pageSize,
@@ -49,12 +53,12 @@ const TableContainer = () => {
   const { t } = useTranslation();
 
   const goToCreate = () => {
-    router.push("/quotation/new");
+    router.push("payslip/new");
   };
 
   return (
     <Stack spacing={2}>
-      <Typography>{t("quotation")}</Typography>
+      <Typography>{t("payslip")}</Typography>
       <Stack
         justifyContent={"space-between"}
         direction="row"

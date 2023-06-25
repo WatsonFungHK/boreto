@@ -48,7 +48,9 @@ model Staff {
   Benefits      Benefit[]    @relation("EligibleStaff")
   Attendance    Attendance[]
   Leave    Leave[]
-  salaries      Salary[]     @relation("SalaryForStaff")
+   basicPay    Int?
+  hourlyRate    Int?
+  payslip       Payslip[]
   companyId     String
   company       Company   @relation(fields: [companyId], references: [id])
   department    Department? @relation(fields: [departmentId], references: [id])
@@ -508,18 +510,23 @@ model Leave {
   Staff   Staff  @relation(fields: [StaffId], references: [id])
 }
 
-model Salary {
+
+model Payslip {
   id          String        @id @default(cuid())
-  salaryDate  DateTime
+  payPeriod   String
+  settleDate  String
   basicPay    Int?
-  hourlyRate  Int?
+  deduction   Int?
+  MPF         Int?
   allowance   Int?
+  netSalary   Int?
   payrollStatus PayrollStatus
+  remark      String
   status      String        @default("A")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime?     @updatedAt
-  staff   Staff  @relation("SalaryForStaff", fields: [staffId], references: [id])
-  staffId String
+  staff       Staff  @relation(fields: [staffId], references: [id])
+  staffId     String
 }
 
 enum PayrollStatus {

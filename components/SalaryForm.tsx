@@ -4,12 +4,17 @@ import {
   TableRow,
   TableCell,
   Typography,
+  MenuItem,
+  Select,
+  TableHead,
   TextField,
   TableBody,
 } from "@mui/material";
+import useDynamicOptions from "hooks/useDynamicOptions";
 import { useEffect } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import colors from "theme/colors";
 
 const SalaryForm = () => {
   const {
@@ -30,7 +35,15 @@ const SalaryForm = () => {
       <TableBody>
         <TableRow>
           <TableCell>
-            <Typography>{t("allowance")}</Typography>
+            <Typography>{t("subtotal")}</Typography>
+          </TableCell>
+          <TableCell>
+            <Typography>{subtotal}</Typography>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Typography>{t("discount")}</Typography>
           </TableCell>
           <TableCell>
             <TextField
@@ -47,7 +60,7 @@ const SalaryForm = () => {
         </TableRow>
         <TableRow>
           <TableCell>
-            <Typography>{t("deduction")}</Typography>
+            <Typography>{t("discount-amount")}</Typography>
           </TableCell>
           <TableCell>
             <TextField
@@ -64,7 +77,7 @@ const SalaryForm = () => {
         </TableRow>
         <TableRow>
           <TableCell>
-            <Typography>{t("MPF")}</Typography>
+            <Typography>{t("total")}</Typography>
           </TableCell>
           <TableCell>
             <TextField
@@ -75,22 +88,6 @@ const SalaryForm = () => {
               InputProps={{
                 endAdornment: "%",
                 startAdornment: "-",
-              }}
-            />
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>
-            <Typography>{t("net-salary")}</Typography>
-          </TableCell>
-          <TableCell>
-            <TextField
-              sx={{
-                border: "none",
-              }}
-              variant="standard"
-              InputProps={{
-                startAdornment: "$",
               }}
             />
           </TableCell>

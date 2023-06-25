@@ -1,7 +1,7 @@
-import { Divider, Stack } from "@mui/material";
-import ItemForm, { orderItemSchema } from "../../components/ItemForm";
-import InfoForm from "../../components/InfoForm";
-import MoneyForm from "../../components/MoneyForm";
+import { Divider, Stack, TextField } from "@mui/material";
+import ItemForm, { orderItemSchema } from "../../../components/ItemForm";
+import InfoForm from "../../../components/InfoForm";
+import MoneyForm from "../../../components/MoneyForm";
 import { useForm, FormProvider } from "react-hook-form";
 import { getDateString } from "utils/date";
 import { LoadingButton } from "@mui/lab";
@@ -12,13 +12,14 @@ import { useItems, getItem, upsertItem } from "lib/swr";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import React, { useEffect, useState } from "react";
-import TermsForm from "../../components/TermsForm";
+import TermsForm from "../../../components/TermsForm";
+import PayslipForm from "components/PayslipForm";
 
 const schema = object().shape({
   sum: number(),
   orderItems: array().of(orderItemSchema).required(),
   externalId: string().required(),
-  quotationDate: string().required(),
+  payslipDate: string().required(),
   effectiveDate: string().optional().nullable(),
 });
 
@@ -35,7 +36,7 @@ const FormContainer = () => {
   const methods = useForm({
     defaultValues: {
       orderItems: [{}],
-      quotationDate: getDateString(),
+      payslipDate: getDateString(),
     },
     resolver: yupResolver(schema),
     mode: "onChange",
@@ -48,7 +49,7 @@ const FormContainer = () => {
     if (!isNew) {
       (async () => {
         try {
-          const item = await getItem(`/api/quotation/${id}`);
+          const item = await getItem(`/api/payslip/${id}`);
           console.log("item: ", item);
           getItem;
           methods.reset(item.payload);
@@ -62,8 +63,8 @@ const FormContainer = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(`/api/quotation/${id}`, data);
-      router.push("/quotation");
+      const response = await upsertItem(`/api/payslip/${id}`, data);
+      router.push("/payslip");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
       toast.error(isNew ? t("created-error") : "updated-error");
@@ -74,15 +75,20 @@ const FormContainer = () => {
 
   return (
     <FormProvider {...methods}>
-      <InfoForm readOnly={!isNew} />
-      <ItemForm readOnly={!isNew} />
+      <PayslipForm readOnly={!isNew} />
       <Divider
         sx={{
           margin: "56px 0 0",
         }}
       />
       <MoneyForm />
-      <TermsForm readOnly={!isNew} />
+      <TextField
+        sx={{ mb: "20px" }}
+        placeholder="Remark"
+        multiline
+        rows={2}
+        maxRows={4}
+      />
       <LoadingButton
         type="submit"
         variant="contained"

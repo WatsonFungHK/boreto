@@ -87,6 +87,11 @@ export const menuItems = [
         link: "/company/benefit",
       },
       {
+        label: "payslip",
+        icon: <AssignmentInd />,
+        link: "/company/payslip",
+      },
+      {
         label: "role",
         icon: <AssignmentInd />,
         link: "/company/role",

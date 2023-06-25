@@ -10,7 +10,10 @@ const update = async (req: NextApiRequest, res: NextApiResponse) => {
   const { updated_at, created_at, addresses, ...data } = req.body;
   const updatedStaff = await prisma.staff.update({
     where: { id: req.body.id },
-    data: data,
+    data: {
+      ...data,
+      designationId: data.designationId,
+    },
   });
 
   await Promise.all(
@@ -84,6 +87,9 @@ export default async function handler(
         response = await prisma.staff.create({
           data: {
             ...data,
+            designation: {
+              connect: { id: data.designationId },
+            },
             company: {
               connect: { id: companyId },
             },
