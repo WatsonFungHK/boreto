@@ -49,8 +49,8 @@ export default async function handler(
             ...data,
             id: req.body.id,
             Staff: {
-              connect: Staff.map((StaffId) => ({
-                Benefit: { connect: { id: StaffId } },
+              connect: Staff.map((Staff) => ({
+                id: Staff.value,
               })),
             },
             Designation: {
@@ -65,13 +65,13 @@ export default async function handler(
           data: {
             ...data,
             Staff: {
-              connect: Staff.map((StaffId) => ({
-                Benefit: { connect: { id: StaffId } },
+              connect: Staff.map((Staff) => ({
+                id: Staff.value,
               })),
             },
             Designation: {
-              connect: Designation.map((designationId) => ({
-                designation: { connect: { id: designationId } },
+              connect: Designation.map((designation) => ({
+                id: designation.value,
               })),
             },
           },
