@@ -5,10 +5,8 @@ import { useTranslation } from "react-i18next";
 import useSWR from "swr";
 import BasicTable from "components/BasicTable";
 import type { Column } from "components/BasicTable";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DebouncedInput from "components/DebouncedInput";
-import { useItems } from "lib/swr";
-import { columns } from "../../../constants/attendance";
 
 const fetcher = async ({ url, filters }) => {
   const queryParams = new URLSearchParams(filters).toString();
@@ -16,14 +14,30 @@ const fetcher = async ({ url, filters }) => {
   return response.data;
 };
 
-const Overview = () => {
+const columns: Array<Column> = [
+  {
+    label: "Quotation Id",
+    accessor: "payload.externalId",
+  },
+  {
+    label: "Created date",
+    accessor: "createdAt",
+    format: (value) => new Date(value).toLocaleDateString(),
+  },
+];
+
+const TableContainer = () => {
   const router = useRouter();
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize] = useState(10); // pageSize
   const [keyword, setKeyword] = useState("");
-  const attendance = useSWR(
+  const {
+    data: { total, items } = { total: 0, items: [] },
+    error,
+    isLoading,
+  } = useSWR(
     {
-      url: "/api/attendance/all",
+      url: "/api/quotation/all",
       filters: {
         pageNumber,
         pageSize,
@@ -32,43 +46,15 @@ const Overview = () => {
     },
     fetcher
   );
-  const leave = useSWR(
-    {
-      url: "/api/leave/all",
-      filters: {
-        pageNumber,
-        pageSize,
-        keyword,
-      },
-    },
-    fetcher
-  );
-
-  const total = attendance.data?.total || 0 + leave.data?.total || 0;
-  const items = [
-    ...(attendance?.data?.items ?? []),
-    ...(leave?.data?.items ?? []),
-  ].map((item) => ({
-    ...item,
-    name: item.Staff.first_name + " " + item.Staff.last_name,
-    type: item.leaveType ? "Leave" : "Attendance",
-  }));
-
-  const isLoading = attendance.isLoading || leave.isLoading;
-
   const { t } = useTranslation();
 
-  const goToCreateAttendance = () => {
-    router.push("/company/attendance/new");
-  };
-
-  const goToCreateLeave = () => {
-    router.push("/company/leave/new");
+  const goToCreate = () => {
+    router.push("/quotation/new");
   };
 
   return (
     <Stack spacing={2}>
-      <Typography>{t("attendance")}</Typography>
+      <Typography>{t("quotation")}</Typography>
       <Stack
         justifyContent={"space-between"}
         direction="row"
@@ -81,11 +67,8 @@ const Overview = () => {
             setPageNumber(1);
           }}
         />
-        <Button variant="contained" onClick={goToCreateAttendance}>
-          {t("create-attendance")}
-        </Button>
-        <Button variant="contained" onClick={goToCreateLeave}>
-          {t("create-leave")}
+        <Button variant="contained" onClick={goToCreate}>
+          {t("create")}
         </Button>
       </Stack>
       <BasicTable
@@ -115,4 +98,4 @@ const Overview = () => {
   );
 };
 
-export default Overview;
+export default TableContainer;

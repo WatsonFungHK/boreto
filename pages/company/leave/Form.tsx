@@ -4,22 +4,25 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import {
   TextField,
   Stack,
+  Button,
   MenuItem,
   Select,
   FormControl,
   Typography,
+  Grid,
 } from "@mui/material";
+import Autocomplete from "components/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { string, object, number, array } from "yup";
 import { useItems, getItem, upsertItem } from "lib/swr";
-import { getDateString } from "utils/date";
 
 const defaultValues = {
   StaffId: "",
-  date: getDateString(),
+  date: "",
+  leaveType: "ANNUAL_LEAVE",
   status: "A",
 };
 
@@ -28,7 +31,9 @@ export const schema = object().shape({
   date: string().required("required"),
   timeIn: string().optional(),
   timeOut: string().optional(),
-  status: string().required("required").default("A"),
+  leaveType: string().required("required"),
+  remark: string().optional(),
+  status: string().required("required"),
 });
 
 export type FormData = ReturnType<(typeof schema)["cast"]>;
@@ -45,16 +50,7 @@ const generateStaffOptions = (users = []) => {
   });
 };
 
-const generateOptions = (options) => {
-  return options.map(({ id, name }) => {
-    return {
-      value: id,
-      label: name,
-    };
-  });
-};
-
-const AttendanceForm = () => {
+const BenefitForm = () => {
   const router = useRouter();
 
   const {
@@ -82,7 +78,7 @@ const AttendanceForm = () => {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
-          const item = await getItem(`/api/benefit/${id}`);
+          const item = await getItem(`/api/attendance/${id}`);
           if (item) {
             reset({
               ...item,
@@ -103,7 +99,7 @@ const AttendanceForm = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      const response = await upsertItem(`/api/attendance/${id}`, data);
+      const response = await upsertItem(`/api/leave/${id}`, data);
       router.push("/company/attendance");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
@@ -181,6 +177,37 @@ const AttendanceForm = () => {
               fullWidth
             />
           </Stack>
+          <Stack>
+            <Typography>{t("leave-type")}</Typography>
+            <FormControl fullWidth>
+              <Controller
+                control={methods.control}
+                name="leaveType"
+                render={({ field }) => (
+                  <Select {...field}>
+                    <MenuItem value="ANNUAL_LEAVE">
+                      {t("annual-leave")}
+                    </MenuItem>
+                    <MenuItem value="SICK_LEAVE">{t("sick-leave")}</MenuItem>
+                    <MenuItem value="NO_PAY_LEAVE">
+                      {t("no-pay-leave")}
+                    </MenuItem>
+                    <MenuItem value="OTHERS">{t("others")}</MenuItem>
+                  </Select>
+                )}
+              />
+            </FormControl>
+          </Stack>
+          <Stack spacing={1}>
+            <Typography>{t("remark")}</Typography>
+            <TextField
+              type="text"
+              {...register("remark")}
+              error={!!errors.timeOut}
+              helperText={errors.timeOut?.message}
+              fullWidth
+            />
+          </Stack>
 
           {!isNew && (
             <Stack>
@@ -214,4 +241,4 @@ const AttendanceForm = () => {
   );
 };
 
-export default AttendanceForm;
+export default BenefitForm;

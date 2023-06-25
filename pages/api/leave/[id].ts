@@ -11,7 +11,7 @@ export default async function handler(
   try {
     if (req.method === "GET") {
       let response;
-      response = await prisma.attendance.findUnique({
+      response = await prisma.leave.findUnique({
         where: {
           id: req.query.id as string,
         },
@@ -51,7 +51,7 @@ export default async function handler(
 
       let response;
       if (req.body.id) {
-        response = await prisma.attendance.update({
+        response = await prisma.leave.update({
           where: {
             id: req.body.id,
           },
@@ -66,7 +66,7 @@ export default async function handler(
           },
         });
       } else {
-        response = await prisma.attendance.create({
+        response = await prisma.leave.create({
           data: {
             ...data,
             Staff: {

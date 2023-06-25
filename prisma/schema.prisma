@@ -36,6 +36,7 @@ model Staff {
   designationId String?
   designation   Designation?  @relation(fields: [designationId], references: [id])
   status        String      @default("A")
+  employment_type String @default("FT")
   joined_date   String
   birth_date    String
   promoted_date String?
@@ -46,6 +47,7 @@ model Staff {
   phone_number  String
   Benefits      Benefit[]    @relation("EligibleStaff")
   Attendance    Attendance[]
+  Leave    Leave[]
   salaries      Salary[]     @relation("SalaryForStaff")
   companyId     String
   company       Company   @relation(fields: [companyId], references: [id])
@@ -464,7 +466,6 @@ model Benefit {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime?     @updatedAt
   Staff         Staff[]       @relation("EligibleStaff")
-  designationId String?
   Designation   Designation[] @relation("BenefitForDesignation")
 }
 
@@ -483,21 +484,38 @@ model Designation {
 
 model Attendance {
   id         String    @id @default(cuid())
-  date       DateTime
+  date       String
+  timeIn     String?
+  timeOut    String?
   status     String    @default("A")
   createdAt  DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  updatedAt  DateTime? @updatedAt
+  StaffId    String
+  Staff   Staff  @relation(fields: [StaffId], references: [id])
+}
+
+model Leave {
+  id         String    @id @default(cuid())
+  date       String
+  timeIn     String?
+  timeOut    String?
+  leaveType  LeaveType 
+  status     String    @default("A")
+  remark     String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
   StaffId    String
   Staff   Staff  @relation(fields: [StaffId], references: [id])
 }
 
 model Salary {
-  id         String        @id @default(cuid())
-  salaryDate DateTime
-  basicPay   Int
-  allowance  Int
-  payrollStatus     PayrollStatus
-  status      String    @default("A")
+  id          String        @id @default(cuid())
+  salaryDate  DateTime
+  basicPay    Int?
+  hourlyRate  Int?
+  allowance   Int?
+  payrollStatus PayrollStatus
+  status      String        @default("A")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime?     @updatedAt
   staff   Staff  @relation("SalaryForStaff", fields: [staffId], references: [id])
@@ -508,6 +526,13 @@ enum PayrollStatus {
   PAID
   PENDING
   REJECTED
+}
+
+enum LeaveType {
+  ANNUAL_LEAVE
+  SICK_LEAVE
+  NO_PAY_LEAVE
+  OTHERS
 }
 // put HR schema end
 

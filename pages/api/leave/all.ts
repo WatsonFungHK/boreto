@@ -31,10 +31,10 @@ export default async function handler(
     const take = _pageSize;
 
     const [total, items] = await prisma.$transaction([
-      prisma.attendance.count({
+      prisma.leave.count({
         where: whereClause,
       }),
-      prisma.attendance.findMany({
+      prisma.leave.findMany({
         ...(pageNumber &&
           pageSize && {
             skip,
