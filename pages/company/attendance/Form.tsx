@@ -82,7 +82,7 @@ const AttendanceForm = () => {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
-          const item = await getItem(`/api/benefit/${id}`);
+          const item = await getItem(`/api/attendance/${id}`);
           if (item) {
             reset({
               ...item,
@@ -90,7 +90,7 @@ const AttendanceForm = () => {
             });
           }
         } catch (err) {
-          toast.error("Error fetching benefit");
+          toast.error("Error fetching attendance");
         } finally {
           setIsLoading(false);
         }
@@ -112,8 +112,6 @@ const AttendanceForm = () => {
       setIsLoading(false);
     }
   };
-
-  // const costType = methods.watch("costType");
 
   if (isLoading) {
     return <div>Loading...</div>;

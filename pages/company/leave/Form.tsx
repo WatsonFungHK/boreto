@@ -78,7 +78,7 @@ const BenefitForm = () => {
       const fetchItem = async () => {
         try {
           setIsLoading(true);
-          const item = await getItem(`/api/attendance/${id}`);
+          const item = await getItem(`/api/leave/${id}`);
           if (item) {
             reset({
               ...item,
