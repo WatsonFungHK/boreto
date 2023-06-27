@@ -48,9 +48,15 @@ export default function BasicTable({
   const { t } = useTranslation();
 
   const defaultOnClick = (row) => () => {
+    console.log({ row });
+
     if (typeof onRowClick === "function") {
       onRowClick(row);
     } else {
+      if (row?.type === "Leave") {
+        router.push(`leave/${row.id}`);
+        return;
+      }
       router.push(`${router.pathname}/${row.id}`);
     }
   };

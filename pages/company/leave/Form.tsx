@@ -118,7 +118,7 @@ const BenefitForm = () => {
   return (
     <Stack spacing={2}>
       <Typography variant="h5">
-        {isNew ? t("create-attendance") : t("update-attendance")}
+        {isNew ? t("create-leave") : t("update-leave")}
       </Typography>
       <FormProvider {...methods}>
         <Stack spacing={2} direction="column">
