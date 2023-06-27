@@ -73,6 +73,8 @@ export default async function handler(
             },
           },
           designation: true,
+          Attendance: true,
+          Leave: true,
         },
       });
 

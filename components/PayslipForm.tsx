@@ -19,6 +19,7 @@ import staff from "pages/company/staff";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import colors from "theme/colors";
+import AttendanceTable from "./AttendanceTable";
 
 const generateStaffOptions = (users = []) => {
   if (users.length === 0) {
@@ -49,6 +50,7 @@ const PayslipForm = ({ readOnly = false }) => {
     name: ["StaffId"],
   });
   const { data: selectedStaff } = useItems(`/api/staff/${id}`);
+
   const { data: { items: staff } = { total: 0, items: [] } } =
     useItems("/api/staff/all");
   return (
@@ -74,10 +76,7 @@ const PayslipForm = ({ readOnly = false }) => {
                   control={control}
                   name="StaffId"
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      onChange={(e) => setValue("StaffId", e.target.value)}
-                    >
+                    <Select {...field}>
                       {staff.map(({ id, first_name, last_name }) => {
                         return (
                           <MenuItem value={id} key={id}>
@@ -120,13 +119,13 @@ const PayslipForm = ({ readOnly = false }) => {
             <Typography>{t("designation")}</Typography>
           </TableCell>
           <TableCell>
-            <Typography>{selectedStaff?.designation || "N/A"}</Typography>
+            <Typography>{selectedStaff?.designation?.name || "N/A"}</Typography>
           </TableCell>
           <TableCell>
             <Typography>Department</Typography>
           </TableCell>
           <TableCell>
-            <Typography>{selectedStaff?.department || "N/A"}</Typography>
+            <Typography>{selectedStaff?.department?.name || "N/A"}</Typography>
           </TableCell>
         </TableRow>
         <TableRow>
@@ -137,9 +136,9 @@ const PayslipForm = ({ readOnly = false }) => {
             <FormControl fullWidth>
               <Controller
                 control={control}
-                name="leaveType"
+                name="payrollStatus"
                 render={({ field }) => (
-                  <Select {...field}>
+                  <Select {...field} defaultValue="PENDING">
                     <MenuItem value="PENDING">{t("pending")}</MenuItem>
                     <MenuItem value="PAID">{t("paid")}</MenuItem>
                     <MenuItem value="REJECTED">{t("rejected")}</MenuItem>
@@ -187,11 +186,15 @@ const PayslipForm = ({ readOnly = false }) => {
             <Typography>{t("basic-salary")}</Typography>
           </TableCell>
           <TableCell>
-            <Typography>{selectedStaff?.basic_salary}</Typography>
+            <Typography>{selectedStaff?.basicPay}</Typography>
           </TableCell>
         </TableRow>
       </Table>
       <br />
+      <AttendanceTable
+        attendance={selectedStaff?.Attendance}
+        leave={selectedStaff?.Leave}
+      />
     </Stack>
   );
 };
