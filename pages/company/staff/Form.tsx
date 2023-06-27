@@ -27,7 +27,7 @@ export const schema = object().shape({
   email: string().email().optional(),
   status: string(),
   phone_number: string().optional(),
-  basic_salary: number(),
+  basicPay: number(),
   employment_type: string().required("required"),
   departmentId: string().optional().nullable(),
   designationId: string().optional().nullable(),
@@ -53,6 +53,7 @@ const defaultValues = {
   last_name: "",
   gender: "",
   status: "A",
+  designationId: "",
   employment_type: "FT",
   birth_date: getDateString(),
   joined_date: getDateString(),
@@ -129,7 +130,7 @@ const Form = ({}: {}) => {
     control,
     formState: { errors },
   } = methods;
-  const { gender, officeId, departmentId, designationId } = watch();
+  const { gender, officeId, departmentId } = watch();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -140,10 +141,7 @@ const Form = ({}: {}) => {
           setIsLoading(true);
           const item = await getItem(id as string);
           if (item) {
-            console.log({ item });
-            reset({
-              ...item,
-            });
+            reset(item);
           }
         } catch (err) {
           toast.error("Error fetching staff");
@@ -333,22 +331,19 @@ const Form = ({}: {}) => {
                   <Controller
                     control={control}
                     name="designationId"
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        onChange={(e) =>
-                          setValue("designationId", e.target.value)
-                        }
-                      >
-                        {designations.map(({ id, name }) => {
-                          return (
-                            <MenuItem value={id} key={id}>
-                              {t(name)}
-                            </MenuItem>
-                          );
-                        })}
-                      </Select>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <Select {...field} defaultValue="">
+                          {designations.map(({ id, name }) => {
+                            return (
+                              <MenuItem value={id} key={id}>
+                                {name}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      );
+                    }}
                   />
                 </FormControl>
               </Stack>
@@ -402,7 +397,7 @@ const Form = ({}: {}) => {
               <Stack spacing={1}>
                 <Typography>{t("basic-salary")}</Typography>
                 <FormControl fullWidth error={!!errors.employment_type}>
-                  <TextField type="number" {...register("basic_salary")} />
+                  <TextField type="number" {...register("basicPay")} />
                 </FormControl>
               </Stack>
             </Grid>

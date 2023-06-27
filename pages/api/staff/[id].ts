@@ -7,7 +7,7 @@ import { companyId } from "pages/api/constants";
 
 const update = async (req: NextApiRequest, res: NextApiResponse) => {
   const staffId = req.body.id;
-  const { updated_at, created_at, addresses, ...data } = req.body;
+  const { updated_at, created_at, addresses, designation, ...data } = req.body;
   const updatedStaff = await prisma.staff.update({
     where: { id: req.body.id },
     data: {
@@ -72,6 +72,7 @@ export default async function handler(
               status: "A",
             },
           },
+          designation: true,
         },
       });
 
@@ -83,12 +84,13 @@ export default async function handler(
       if (req.body.id) {
         response = await update(req, res);
       } else {
-        const { updated_at, created_at, addresses, ...data } = req.body;
+        const { updated_at, created_at, addresses, designationId, ...data } =
+          req.body;
         response = await prisma.staff.create({
           data: {
             ...data,
             designation: {
-              connect: { id: data.designationId },
+              connect: { id: designationId },
             },
             company: {
               connect: { id: companyId },
