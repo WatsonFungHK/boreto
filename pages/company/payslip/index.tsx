@@ -21,7 +21,7 @@ const columns: Array<Column> = [
   },
   {
     label: "Staff",
-    accessor: "name",
+    accessor: "staff.first_name",
   },
   {
     label: "Created date",

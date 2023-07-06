@@ -6,11 +6,9 @@ import {
   Typography,
   MenuItem,
   Select,
-  TableHead,
   TextField,
-  InputBase,
-  Divider,
   FormControl,
+  TableBody,
 } from "@mui/material";
 import useDynamicOptions from "hooks/useDynamicOptions";
 import useStaffOptions from "hooks/useStaffOptions";
@@ -21,38 +19,43 @@ import { useTranslation } from "react-i18next";
 import colors from "theme/colors";
 import AttendanceTable from "./AttendanceTable";
 
-const generateStaffOptions = (users = []) => {
-  if (users.length === 0) {
-    return [];
-  }
-  return users.map(({ id, first_name, last_name }) => {
-    return {
-      value: id,
-      label: first_name + " " + last_name,
-    };
-  });
-};
-
-const PayslipForm = ({ readOnly = false }) => {
+const PayslipForm = ({ readOnly = false, methods }) => {
   const {
-    formState: { errors },
-    watch,
-    setValue,
     register,
     control,
-  } = useFormContext();
+    handleSubmit,
+    watch,
+    reset,
+    getValues,
+    formState: { errors },
+  } = methods;
   const { t } = useTranslation();
-  const customerId = watch("customerId");
-  const quotationDate = watch("quotationDate");
 
   const [id] = useWatch({
     control,
-    name: ["StaffId"],
+    name: ["staffId"],
   });
-  const { data: selectedStaff } = useItems(`/api/staff/${id}`);
+  const [payPeriod] = useWatch({
+    control,
+    name: ["payPeriod"],
+  });
+  const { data: selectedStaff } = useItems(
+    `/api/staff/${id}?payPeriod=${payPeriod}`
+  );
 
   const { data: { items: staff } = { total: 0, items: [] } } =
     useItems("/api/staff/all");
+  const basicPay = readOnly ? getValues("basicPay") : selectedStaff?.basicPay;
+  const deduction = watch("deduction");
+  const allowance = watch("allowance");
+  const maxMPF =
+    Math.round(
+      (basicPay - parseInt(deduction) + parseInt(allowance)) * 0.05 * 100
+    ) / 100;
+  const mpfAmount = maxMPF >= 1500 ? 1500 : maxMPF;
+  const netSalaryAmount =
+    basicPay - parseInt(deduction) + parseInt(allowance) - mpfAmount;
+
   return (
     <Stack>
       <Table
@@ -71,22 +74,28 @@ const PayslipForm = ({ readOnly = false }) => {
           </TableCell>
           <TableCell width="300px">
             <Stack spacing={1} flexDirection="row" alignItems="center">
-              <FormControl fullWidth error={!!errors.StaffId}>
-                <Controller
-                  control={control}
-                  name="StaffId"
-                  render={({ field }) => (
-                    <Select {...field}>
-                      {staff.map(({ id, first_name, last_name }) => {
-                        return (
-                          <MenuItem value={id} key={id}>
-                            {first_name} {last_name}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  )}
-                />
+              <FormControl fullWidth error={!!errors.staffId}>
+                {!readOnly ? (
+                  <Controller
+                    control={methods.control}
+                    name="staffId"
+                    render={({ field }) => (
+                      <Select {...field}>
+                        {staff.map(({ id, first_name, last_name }) => {
+                          return (
+                            <MenuItem value={id} key={id}>
+                              {first_name} {last_name}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    )}
+                  />
+                ) : (
+                  <Typography>
+                    {selectedStaff?.first_name + selectedStaff?.last_name}
+                  </Typography>
+                )}
               </FormControl>
             </Stack>
           </TableCell>
@@ -186,7 +195,7 @@ const PayslipForm = ({ readOnly = false }) => {
             <Typography>{t("basic-salary")}</Typography>
           </TableCell>
           <TableCell>
-            <Typography>{selectedStaff?.basicPay}</Typography>
+            <Typography>{basicPay}</Typography>
           </TableCell>
         </TableRow>
       </Table>
@@ -195,6 +204,94 @@ const PayslipForm = ({ readOnly = false }) => {
         attendance={selectedStaff?.Attendance}
         leave={selectedStaff?.Leave}
       />
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              <Typography>{t("deduction")}</Typography>
+            </TableCell>
+            <TableCell>
+              <TextField
+                disabled={readOnly}
+                defaultValue={0}
+                {...register("deduction")}
+                inputProps={{ min: 0 }}
+                type="number"
+                sx={{
+                  border: "none",
+                }}
+                variant="standard"
+                InputProps={{
+                  startAdornment: "-$",
+                }}
+              />
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              <Typography>{t("allowance")}</Typography>
+            </TableCell>
+            <TableCell>
+              <TextField
+                disabled={readOnly}
+                defaultValue={0}
+                {...register("allowance")}
+                type="number"
+                inputProps={{ min: 0 }}
+                sx={{
+                  border: "none",
+                }}
+                variant="standard"
+                InputProps={{
+                  startAdornment: "+$",
+                }}
+              />
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              <Typography>{t("mpf")}</Typography>
+            </TableCell>
+            <TableCell>
+              <TextField
+                disabled
+                type="number"
+                // inputProps={{ min: 0 }}
+                {...register("MPF")}
+                sx={{
+                  border: "none",
+                }}
+                value={mpfAmount <= 0 ? 0 : mpfAmount}
+                variant="standard"
+                InputProps={{
+                  startAdornment: "-$",
+                }}
+              />
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              <Typography>{t("net-salary")}</Typography>
+            </TableCell>
+            <TableCell>
+              <TextField
+                disabled
+                inputProps={{ min: 0 }}
+                {...register("netSalary")}
+                sx={{
+                  border: "none",
+                }}
+                type="number"
+                value={netSalaryAmount <= 0 ? 0 : netSalaryAmount}
+                variant="standard"
+                InputProps={{
+                  startAdornment: "$",
+                }}
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </Stack>
   );
 };

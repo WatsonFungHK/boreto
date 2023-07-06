@@ -521,7 +521,7 @@ model Payslip {
   allowance   Int?
   netSalary   Int?
   payrollStatus PayrollStatus
-  remark      String
+  remark     String?
   status      String        @default("A")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime?     @updatedAt
