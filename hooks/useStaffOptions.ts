@@ -9,8 +9,15 @@ const fetcher = async ({ url, filters }) => {
   return response.data;
 };
 
+const defaultRender = (staffItems) => staffItems.map(({ id, first_name, last_name, department }) => {
+  return {
+    value: id,
+    label: first_name + " " + last_name + " / " + department?.name,
+  };
+});
 
-const useStaffOptions = (callback: (staff: unknown[]) => unknown[]) => {
+
+const useStaffOptions = (callback: (staff: unknown[]) => unknown[]= defaultRender) => {
   const {
     data: { total, items: staff } = { total: 0, items: [] },
     error,

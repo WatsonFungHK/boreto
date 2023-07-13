@@ -29,6 +29,7 @@ import { Visibility } from "@mui/icons-material";
 import colors from "theme/colors";
 import PaymentForm, { paymentSchema } from "components/PaymentForm";
 import ItemForm, { generateProductOptions } from "components/ItemForm";
+import useStaffOptions from "hooks/useStaffOptions";
 
 export const schema = object().shape({
   isNew: boolean(),
@@ -100,6 +101,7 @@ const OrderForm = ({}: {}) => {
     "customer",
     generateCustomerOptions
   );
+  const staffOptions = useStaffOptions();
 
   const {
     query: { id },
@@ -280,6 +282,20 @@ const OrderForm = ({}: {}) => {
           <Card>
             <CardContent>
               <PaymentForm />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <Typography>Commission</Typography>
+              <Select>
+                {staffOptions.map(({ value, label }) => {
+                  return (
+                    <MenuItem value={value} key={value}>
+                      {t(label)}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
             </CardContent>
           </Card>
           {isNew && (

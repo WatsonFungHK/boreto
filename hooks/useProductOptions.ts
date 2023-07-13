@@ -23,8 +23,8 @@ const useProductOptions = (callback) => {
   );
   const options = useMemo(() => {
     const _products = products.sort((a, b) => {
-      const categoryNameA = a.category.name.toUpperCase();
-      const categoryNameB = b.category.name.toUpperCase();
+      const categoryNameA = a.category?.name?.toUpperCase() || '';
+      const categoryNameB = b.category?.name?.toUpperCase() || '';
   
       if (categoryNameA < categoryNameB) {
         return -1;
