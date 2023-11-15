@@ -40,28 +40,28 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
     </>
   );
 
-  return (
-    <SessionProvider session={pageProps.session}>
-      {/* {Component.auth !== false ? (
-        <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
-      ) : (
-        getLayout(<Component {...pageProps} />)
-      )} */}
-      {getLayout(<Component {...pageProps} />)}
-      <ToastContainer
-        position="bottom-left"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-    </SessionProvider>
-  );
+  // return (
+  //   <SessionProvider session={pageProps.session}>
+  //     {/* {Component.auth !== false ? (
+  //       <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
+  //     ) : (
+  //       getLayout(<Component {...pageProps} />)
+  //     )} */}
+  //     {getLayout(<Component {...pageProps} />)}
+  //     <ToastContainer
+  //       position="bottom-left"
+  //       autoClose={5000}
+  //       hideProgressBar={false}
+  //       newestOnTop={false}
+  //       closeOnClick
+  //       rtl={false}
+  //       pauseOnFocusLoss
+  //       draggable
+  //       pauseOnHover
+  //       theme="light"
+  //     />
+  //   </SessionProvider>
+  // );
 };
 
 export default App;

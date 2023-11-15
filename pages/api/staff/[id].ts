@@ -62,9 +62,9 @@ export default async function handler(
 ) {
   try {
     if (req.method === "GET") {
-      const startPeriod = (req.query.payPeriod as string).replace("?", "-");
-      const year = startPeriod.split("-")[0];
-      const month = parseInt(startPeriod.split("-")[1]);
+      // const startPeriod = (req.query.payPeriod as string).replace("?", "-");
+      // const year = startPeriod.split("-")[0];
+      // const month = parseInt(startPeriod.split("-")[1]);
 
       const response = await prisma.staff.findUnique({
         where: {
@@ -77,22 +77,24 @@ export default async function handler(
             },
           },
           designation: true,
-          Attendance: {
-            where: {
-              date: {
-                gte: `${startPeriod}-01`,
-                lt: `${year}-${month}-01`,
-              },
-            },
-          },
-          Leave: {
-            where: {
-              date: {
-                gte: `${startPeriod}-01`,
-                lt: `${year}-${month + 1}-01`,
-              },
-            },
-          },
+          attendance: true,
+          leave: true
+          // Attendance: {
+          //   where: {
+          //     date: {
+          //       gte: `${startPeriod}-01`,
+          //       lt: `${year}-${month}-01`,
+          //     },
+          //   },
+          // },
+          // Leave: {
+          //   where: {
+          //     date: {
+          //       gte: `${startPeriod}-01`,
+          //       lt: `${year}-${month + 1}-01`,
+          //     },
+          //   },
+          // },
         },
       });
 

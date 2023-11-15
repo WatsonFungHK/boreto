@@ -48,8 +48,8 @@ export default async function handler(
         include: {
           _count: {
             select: {
-              Designation: true,
-              Staff: true,
+              designation: true,
+              staff: true,
             },
           },
         },

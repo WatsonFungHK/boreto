@@ -22,16 +22,16 @@ import { useItems, getItem, upsertItem } from "lib/swr";
 const defaultValues = {
   name: "",
   description: "",
-  Designation: [],
-  Staff: [],
+  designation: [],
+  staff: [],
   status: "A",
 };
 
 export const schema = object().shape({
   name: string().required("required"),
   description: string().optional(),
-  Designation: array().optional(),
-  Staff: array().optional(),
+  designation: array().optional(),
+  staff: array().optional(),
   status: string().required("required"),
 });
 
@@ -93,8 +93,8 @@ const BenefitForm = () => {
           if (item) {
             reset({
               ...item,
-              Staff: generateStaffOptions(staff),
-              Designation: generateOptions(designation),
+              staff: generateStaffOptions(staff),
+              designation: generateOptions(designation),
             });
           }
         } catch (err) {
@@ -154,12 +154,12 @@ const BenefitForm = () => {
           </Stack>
           <Autocomplete
             options={generateStaffOptions(staff)}
-            name="Staff"
+            name="staff"
             subtitle="staff"
           />
           <Autocomplete
             options={generateOptions(designation)}
-            name="Designation"
+            name="designation"
             subtitle="designation"
           />
 

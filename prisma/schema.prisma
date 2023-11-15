@@ -45,9 +45,9 @@ model Staff {
   email         String @unique
   addresses     Address[] 
   phone_number  String
-  Benefits      Benefit[]    @relation("EligibleStaff")
-  Attendance    Attendance[]
-  Leave    Leave[]
+  benefits      Benefit[]    @relation("EligibleStaff")
+  attendance    Attendance[]
+  leave    Leave[]
    basicPay    Int?
   hourlyRate    Int?
   payslip       Payslip[]
@@ -467,8 +467,8 @@ model Benefit {
   description   String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime?     @updatedAt
-  Staff         Staff[]       @relation("EligibleStaff")
-  Designation   Designation[] @relation("BenefitForDesignation")
+  staff         Staff[]       @relation("EligibleStaff")
+  designation   Designation[] @relation("BenefitForDesignation")
 }
 
 model Designation {
@@ -476,12 +476,12 @@ model Designation {
   name       String    @unique
   description String 
   status     String    @default("A")
-  DepartmentId String? 
-  Department Department?  @relation(fields: [DepartmentId], references: [id])
+  departmentId String? 
+  department Department?  @relation(fields: [departmentId], references: [id])
   createdAt  DateTime  @default(now())
   updatedAt  DateTime?     @updatedAt
-  Staff   Staff[]
-  Benefit Benefit[] @relation("BenefitForDesignation")
+  staff   Staff[]
+  benefit Benefit[] @relation("BenefitForDesignation")
 }
 
 model Attendance {

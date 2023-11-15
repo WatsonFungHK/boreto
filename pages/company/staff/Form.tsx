@@ -396,7 +396,7 @@ const Form = ({}: {}) => {
             <Grid item xs={6}>
               <Stack spacing={1}>
                 <Typography>{t("basic-salary")}</Typography>
-                <FormControl fullWidth error={!!errors.employment_type}>
+                <FormControl fullWidth error={!!errors.basicPay}>
                   <TextField type="number" {...register("basicPay")} />
                 </FormControl>
               </Stack>

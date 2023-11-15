@@ -16,14 +16,14 @@ export default async function handler(
           id: req.query.id as string,
         },
         include: {
-          Staff: {
+          staff: {
             select: {
               id: true,
               first_name: true,
               last_name: true,
             },
           },
-          Designation: {
+          designation: {
             select: {
               id: true,
               name: true,
@@ -37,7 +37,7 @@ export default async function handler(
     if (req.method === "POST") {
       const session = await getSession();
       const id = req.body.id || cuid();
-      const { updated_at, created_at, Staff, Designation, ...data } = req.body;
+      const { updated_at, created_at, staff, designation, ...data } = req.body;
 
       let response;
       if (req.body.id) {
@@ -48,13 +48,13 @@ export default async function handler(
           data: {
             ...data,
             id: req.body.id,
-            Staff: {
-              connect: Staff.map((Staff) => ({
-                id: Staff.value,
+            staff: {
+              connect: staff.map(({ value }) => ({
+                id: value,
               })),
             },
             Designation: {
-              connect: Designation.map((designation) => ({
+              connect: designation.map((designation) => ({
                 id: designation.value,
               })),
             },
@@ -64,13 +64,13 @@ export default async function handler(
         response = await prisma.benefit.create({
           data: {
             ...data,
-            Staff: {
-              connect: Staff.map((Staff) => ({
+            staff: {
+              connect: staff.map((Staff) => ({
                 id: Staff.value,
               })),
             },
-            Designation: {
-              connect: Designation.map((designation) => ({
+            designation: {
+              connect: designation.map((designation) => ({
                 id: designation.value,
               })),
             },

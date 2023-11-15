@@ -16,13 +16,13 @@ export default async function handler(
           id: req.query.id as string,
         },
         include: {
-          Benefit: {
+          benefit: {
             select: {
               id: true,
               name: true,
             },
           },
-          Department: {
+          department: {
             select: {
               id: true,
               name: true,
@@ -42,13 +42,13 @@ export default async function handler(
         const createdDesignation = await prisma.designation.create({
           data: {
             ...data,
-            Benefit: {
+            benefit: {
               connect: benefits?.map((benefit) => ({
-                Benefit: { connect: { id: benefit.id } },
+                benefit: { connect: { id: benefit.id } },
               })),
             },
             ...(departmentId && {
-              Department: {
+              department: {
                 connect: {
                   id: departmentId,
                 },
@@ -64,12 +64,12 @@ export default async function handler(
             name: data.name,
             description: data.description,
             status: data.status,
-            Benefit: {
+            benefit: {
               connect: benefits?.map((benefitId) => ({
-                Benefit: { connect: { id: benefitId } },
+                benefit: { connect: { id: benefitId } },
               })),
             },
-            ...(departmentId && { DepartmentId: departmentId }),
+            ...(departmentId && { departmentId: departmentId }),
           },
         });
         res.status(200).json(updatedDesignation);

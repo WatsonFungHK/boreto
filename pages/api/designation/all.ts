@@ -48,15 +48,15 @@ export default async function handler(
         include: {
           _count: {
             select: {
-              Staff: true,
+              staff: true,
             },
           },
-          Department: {
+          department: {
             select: {
               name: true,
             },
           },
-          Benefit: {
+          benefit: {
             select: {
               id: true,
               name: true,

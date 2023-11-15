@@ -6,10 +6,10 @@ export const columns = [
   { label: "description", accessor: "description" },
   {
     label: "designation_count",
-    accessor: "_count.Designation",
+    accessor: "_count.designation",
   },
   {
     label: "staff_count",
-    accessor: "_count.Staff",
+    accessor: "_count.staff",
   },
 ];
