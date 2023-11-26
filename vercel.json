@@ -4,8 +4,8 @@
     "PRISMA_FORCE_NAPI": "true"
   },
   "functions": {
-    "api/**/*": {
-      "runtime": "@vercel/node@1.19.2"
+    "pages/api/**/*.{js,ts}": {
+      "maxDuration": 30
     }
   }
 }
