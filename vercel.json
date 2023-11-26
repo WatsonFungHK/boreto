@@ -4,7 +4,7 @@
     "PRISMA_FORCE_NAPI": "true"
   },
   "functions": {
-    "api/**/*.js": {
+    "api/**/*": {
       "runtime": "@vercel/node@1.19.2"
     }
   }
