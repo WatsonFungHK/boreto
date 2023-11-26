@@ -1,0 +1,17 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "version": 2,
+  "env": {
+    "PRISMA_FORCE_NAPI": "true"
+  },
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node@1.19.2"
+    }
+  }
+}
