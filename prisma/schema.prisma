@@ -31,8 +31,35 @@ model User {
 }
 
 model Staff {
-  id     String  @id @default(cuid())
-  gender String? // 'M' = Male, 'F' = 'Female, 'U' = 'Unspecified
+  id            String  @id @default(cuid())
+  gender        String? // 'M' = Male, 'F' = 'Female, 'U' = 'Unspecified
+  designationId String?
+  designation   Designation?  @relation(fields: [designationId], references: [id])
+  status        String      @default("A")
+  employment_type String @default("FT")
+  joined_date   String
+  birth_date    String
+  promoted_date String?
+  first_name    String?
+  last_name     String?
+  email         String @unique
+  addresses     Address[] 
+  phone_number  String
+  benefits      Benefit[]    @relation("EligibleStaff")
+  attendance    Attendance[]
+  leave    Leave[]
+   basicPay    Int?
+  hourlyRate    Int?
+  payslip       Payslip[]
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id])
+  department    Department? @relation(fields: [departmentId], references: [id])
+  departmentId  String?
+  officeId      String?
+  office        Office?     @relation(fields: [officeId], references: [id])
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
 }
 
 model Department {
@@ -45,6 +72,8 @@ model Department {
   created_at  DateTime  @default(now())
   updated_at  DateTime? @updatedAt
   users       User[]
+  Staff       Staff[]
+  designation Designation[]
 }
 
 model Address {
@@ -67,6 +96,8 @@ model Address {
   supplier    Supplier? @relation(fields: [supplierId], references: [id])
   supplierId  String?
   shipping    Shipping? // Add optional one-to-one relationship to Shipping
+  StaffId     String?
+  Staff       Staff?  @relation(fields: [StaffId], references: [id])
 }
 
 model Office {
@@ -81,6 +112,7 @@ model Office {
   updated_at  DateTime?
   addresses   Address[]
   users       User[]
+  staff       Staff[]
 }
 
 model Company {
@@ -97,6 +129,7 @@ model Company {
   defaultLocale                String            @default("en")
   defaultCurrency              String            @default("HKD")
   User                         User[]
+  Staff                        Staff[]
   Customer                     Customer[]
   ProductCategory              ProductCategory[]
   Product                      Product[]
@@ -427,7 +460,87 @@ model AuditLog {
 }
 
 // put HR schema start here
+model Benefit {
+  id            String    @id @default(cuid())
+  name          String
+  status        String    @default("A")
+  description   String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime?     @updatedAt
+  staff         Staff[]       @relation("EligibleStaff")
+  designation   Designation[] @relation("BenefitForDesignation")
+}
 
+model Designation {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  description String 
+  status     String    @default("A")
+  departmentId String? 
+  department Department?  @relation(fields: [departmentId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime?     @updatedAt
+  staff   Staff[]
+  benefit Benefit[] @relation("BenefitForDesignation")
+}
+
+model Attendance {
+  id         String    @id @default(cuid())
+  date       String
+  timeIn     String?
+  timeOut    String?
+  status     String    @default("A")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  StaffId    String
+  Staff   Staff  @relation(fields: [StaffId], references: [id])
+}
+
+model Leave {
+  id         String    @id @default(cuid())
+  date       String
+  timeIn     String?
+  timeOut    String?
+  leaveType  LeaveType 
+  status     String    @default("A")
+  remark     String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  StaffId    String
+  Staff   Staff  @relation(fields: [StaffId], references: [id])
+}
+
+
+model Payslip {
+  id          String        @id @default(cuid())
+  payPeriod   String
+  settleDate  String
+  basicPay    Int?
+  deduction   Int?
+  MPF         Int?
+  allowance   Int?
+  netSalary   Int?
+  payrollStatus PayrollStatus
+  remark     String?
+  status      String        @default("A")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime?     @updatedAt
+  staff       Staff  @relation(fields: [staffId], references: [id])
+  staffId     String
+}
+
+enum PayrollStatus {
+  PAID
+  PENDING
+  REJECTED
+}
+
+enum LeaveType {
+  ANNUAL_LEAVE
+  SICK_LEAVE
+  NO_PAY_LEAVE
+  OTHERS
+}
 // put HR schema end
 
 // put CRM schema start here

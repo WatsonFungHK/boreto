@@ -57,6 +57,11 @@ export const menuItems = [
     baseLink: "/company",
     subLinks: [
       {
+        label: "attendance",
+        icon: <People />,
+        link: "/company/attendance",
+      },
+      {
         label: "department",
         icon: <Business />,
         link: "/company/department",
@@ -70,6 +75,21 @@ export const menuItems = [
         label: "staff",
         icon: <People />,
         link: "/company/staff",
+      },
+      {
+        label: "designation",
+        icon: <AssignmentInd />,
+        link: "/company/designation",
+      },
+      {
+        label: "benefit",
+        icon: <AssignmentInd />,
+        link: "/company/benefit",
+      },
+      {
+        label: "payslip",
+        icon: <AssignmentInd />,
+        link: "/company/payslip",
       },
       {
         label: "role",
@@ -104,6 +124,7 @@ const SideMenu = ({ isExpanded }: { isExpanded: boolean }) => {
   return (
     <Stack
       sx={{
+        overflow: "auto",
         color: "white",
         width: isExpanded ? expandedWidth : collapsedWidth,
         height: "100vh",

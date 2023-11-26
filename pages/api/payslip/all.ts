@@ -1,17 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "lib/prisma";
-import { getServerSession } from "next-auth/next";
 import { companyId } from "../constants";
 
-const filterFields = ["first_name", "last_name", "email", "phone_number"];
+const filterFields = ["name"];
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    const { keyword, pageNumber, pageSize } = req.query;
+    const { keyword = "", pageNumber, pageSize } = req.query;
     const filterConditions = filterFields.map((field) => {
       return {
         [field]: {
@@ -21,10 +20,10 @@ export default async function handler(
       };
     });
     const whereClause = {
-      companyId: companyId,
-      // NOT: {
-      //   status: 'D'
-      // },
+      companyId,
+      NOT: {
+        status: "D",
+      },
       // OR: [...filterConditions]
     };
 
@@ -34,20 +33,19 @@ export default async function handler(
     const take = _pageSize;
 
     const [total, items] = await prisma.$transaction([
-      prisma.staff.count({
-        where: whereClause,
-      }),
-      prisma.staff.findMany({
+      prisma.payslip.count(),
+      prisma.payslip.findMany({
         orderBy: {
           updatedAt: "desc",
         },
-        where: whereClause,
-        skip,
-        take,
-        include: {
-          department: true,
-          office: true,
-        },
+        ...(pageNumber &&
+          pageSize && {
+            skip,
+            take,
+            include: {
+              staff: true,
+            },
+          }),
       }),
     ]);
     res.status(200).json({ total, items });

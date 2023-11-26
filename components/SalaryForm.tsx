@@ -16,7 +16,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import colors from "theme/colors";
 
-const MoneyForm = () => {
+const SalaryForm = () => {
   const {
     control,
     formState: { errors },
@@ -97,4 +97,4 @@ const MoneyForm = () => {
   );
 };
 
-export default MoneyForm;
+export default SalaryForm;

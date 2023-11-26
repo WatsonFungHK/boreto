@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "env": {
+    "PRISMA_FORCE_NAPI": "true"
+  },
+  "functions": {
+    "pages/api/**/*.{js,ts}": {
+      "maxDuration": 30
+    }
+  }
+}

@@ -23,14 +23,18 @@ import useSWR from "swr";
 export const schema = object().shape({
   first_name: string().required("required"),
   last_name: string().optional(),
-  nick_name: string().optional(),
   gender: string().optional(),
   email: string().email().optional(),
+  status: string(),
   phone_number: string().optional(),
-  departmentId: string().optional(),
-  officeId: string().optional(),
+  basicPay: number(),
+  employment_type: string().required("required"),
+  departmentId: string().optional().nullable(),
+  designationId: string().optional().nullable(),
+  officeId: string().optional().nullable(),
   birth_date: string().optional().nullable(),
   joined_date: string().optional().nullable(),
+  promoted_date: string().optional().nullable(),
   addresses: array().of(
     object({
       line_1: string().required(),
@@ -48,13 +52,15 @@ const defaultValues = {
   first_name: "",
   last_name: "",
   gender: "",
-  birth_date: undefined,
+  status: "A",
+  designationId: "",
+  employment_type: "FT",
+  birth_date: getDateString(),
   joined_date: getDateString(),
-  departmentId: "",
-  officeId: "",
+  promoted_date: getDateString(),
 };
 
-export type FormData = ReturnType<typeof schema["cast"]>;
+export type FormData = ReturnType<(typeof schema)["cast"]>;
 
 const GENDERS = [
   { value: "M", label: "male" },
@@ -66,6 +72,11 @@ const STATUSES = [
   { value: "A", label: "active" },
   { value: "I", label: "inactive" },
   { value: "D", label: "deleted" },
+];
+
+const EMPLOYMENT_TYPE = [
+  { value: "FT", label: "full-time" },
+  { value: "PT", label: "part-time" },
 ];
 
 const getItem = async (id: string) => {
@@ -101,6 +112,11 @@ const Form = ({}: {}) => {
     isLoading: isLoadingOffices,
   } = useSWR("/api/office/all", fetcher);
 
+  const {
+    data: { items: designations } = { items: [] },
+    isLoading: isLoadingDesignation,
+  } = useSWR("/api/designation/all", fetcher);
+
   const methods = useForm<FormData>({
     defaultValues,
     resolver: yupResolver(schema),
@@ -125,9 +141,7 @@ const Form = ({}: {}) => {
           setIsLoading(true);
           const item = await getItem(id as string);
           if (item) {
-            reset({
-              ...item,
-            });
+            reset(item);
           }
         } catch (err) {
           toast.error("Error fetching staff");
@@ -144,7 +158,7 @@ const Form = ({}: {}) => {
     try {
       setIsLoading(true);
       const response = await upsertItem(id as string, data);
-      router.push("/user");
+      router.push("/company/staff");
       toast.success(isNew ? t("created-success") : "updated-success");
     } catch (err) {
       toast.error(isNew ? t("created-error") : "updated-error");
@@ -181,6 +195,50 @@ const Form = ({}: {}) => {
                   helperText={errors.last_name?.message}
                   fullWidth
                 />
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("gender")}</Typography>
+                <FormControl fullWidth error={!!errors.gender}>
+                  <Select
+                    value={gender}
+                    onChange={(e) => setValue("gender", e.target.value)}
+                  >
+                    {GENDERS.map(({ value, label }) => {
+                      return (
+                        <MenuItem value={value} key={value}>
+                          {t(label)}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("status")}</Typography>
+                <FormControl fullWidth error={!!errors.status}>
+                  <Controller
+                    control={control}
+                    name="status"
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        onChange={(e) => setValue("status", e.target.value)}
+                      >
+                        {STATUSES.map(({ label, value }) => {
+                          return (
+                            <MenuItem value={value} key={value}>
+                              {t(label)}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    )}
+                  />
+                </FormControl>
               </Stack>
             </Grid>
             <Grid item xs={6}>
@@ -231,6 +289,18 @@ const Form = ({}: {}) => {
             </Grid>
             <Grid item xs={6}>
               <Stack spacing={1}>
+                <Typography>{t("promoted_date")}</Typography>
+                <TextField
+                  type="date"
+                  {...register("promoted_date")}
+                  error={!!errors.promoted_date}
+                  helperText={errors.promoted_date?.message}
+                  fullWidth
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
                 <Typography>{t("office")}</Typography>
                 <FormControl fullWidth error={!!errors.officeId}>
                   <Controller
@@ -250,6 +320,30 @@ const Form = ({}: {}) => {
                         })}
                       </Select>
                     )}
+                  />
+                </FormControl>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("designation")}</Typography>
+                <FormControl fullWidth error={!!errors.designationId}>
+                  <Controller
+                    control={control}
+                    name="designationId"
+                    render={({ field }) => {
+                      return (
+                        <Select {...field} defaultValue="">
+                          {designations.map(({ id, name }) => {
+                            return (
+                              <MenuItem value={id} key={id}>
+                                {name}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      );
+                    }}
                   />
                 </FormControl>
               </Stack>
@@ -276,18 +370,39 @@ const Form = ({}: {}) => {
                 </FormControl>
               </Stack>
             </Grid>
+
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("employment-type")}</Typography>
+                <FormControl fullWidth error={!!errors.employment_type}>
+                  <Controller
+                    control={control}
+                    name="employment_type"
+                    render={({ field }) => (
+                      <Select {...field}>
+                        {EMPLOYMENT_TYPE.map(({ label, value }) => {
+                          return (
+                            <MenuItem value={value} key={value}>
+                              {t(label)}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack spacing={1}>
+                <Typography>{t("basic-salary")}</Typography>
+                <FormControl fullWidth error={!!errors.basicPay}>
+                  <TextField type="number" {...register("basicPay")} />
+                </FormControl>
+              </Stack>
+            </Grid>
           </Grid>
-          <Stack spacing={1}>
-            <Typography>{t("nick_name")}</Typography>
-            <TextField
-              type="text"
-              inputProps={{ min: 0 }}
-              {...register("nick_name")}
-              error={!!errors.nick_name}
-              helperText={errors.nick_name?.message}
-              fullWidth
-            />
-          </Stack>
+
           <AddressForm />
           <LoadingButton
             type="submit"
