@@ -27,9 +27,6 @@ export default async function handler(
     where: {
       id: req.body.id,
     },
-    include: {
-      images: true,
-    }
   });
 
    res.status(200).json(response);

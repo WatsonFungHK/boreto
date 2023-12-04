@@ -23,6 +23,8 @@ import useSWR from "swr";
 import ImageForm, { imageSchema } from "components/ImageForm";
 import Dropzone from "components/Dropzone";
 import supabase from "lib/supabase";
+import Attachment from "components/Attachment";
+import cuid from "cuid";
 
 const defaultValues = {
   type: "P" as "P" | "S",
@@ -46,7 +48,7 @@ export const schema = object().shape({
   description: string().optional(),
   unit: number().when("type", {
     is: "P",
-    then: (schema) => schema.positive().required("required"),
+    then: (schema) => schema.optional(),
     otherwise: (schema) => schema.optional(),
   }),
   price: number().positive().required("required"),
@@ -125,13 +127,14 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
   }, [isNew]);
 
   const handleFile = async (file) => {
-    const data = await supabase.storage
-      .from("product-image")
-      .upload(file.name, file);
-    await supabase.from("product-image").insert({
-      productId: id as string,
+    const fileId = cuid();
+    await supabase.storage.from("attachment").upload(fileId, file);
+    await supabase.from("Attachment").insert({
+      id: fileId,
+      modelId: id,
+      modelName: "product",
       name: file.name,
-      url: `https://jsxhhyfhmmrlusumnxbq.supabase.co/storage/v1/object/public/product-image/${data.data.path}`,
+      url: `https://jsxhhyfhmmrlusumnxbq.supabase.co/storage/v1/object/public/product-image/${fileId}`,
     });
   };
 
@@ -259,6 +262,7 @@ const ProductForm = ({ snapshot }: { snapshot?: FormData }) => {
             </>
           )}
           <Dropzone handleFile={handleFile} />
+          <Attachment modelName="product" modelId={id} />
           <LoadingButton
             type="submit"
             variant="contained"

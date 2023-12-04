@@ -16,7 +16,6 @@ export default async function handler(
           id: req.query.id as string,
         },
         include: {
-          images: true,
           category: true,
         }
       });
@@ -40,13 +39,10 @@ export default async function handler(
         });
         res.status(200).json(response);
       } else {
-        const { updated_at, created_at, images, ...data } = req.body;
+        const { updated_at, created_at, ...data } = req.body;
         const response = await prisma.product.create({
           data: {
             ...data,
-            images: {
-              create: [...images]
-            },
             companyId,
           },
         });

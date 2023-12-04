@@ -1,2 +1,2 @@
-export const companyId = 'clgtfy8rz000008lfhpb9gh0v';
-export const userId = 'clgtg0bbq000108lf2orca22k'
+export const companyId = 'clpgy6m2g000008l3h8p3hy8p';
+export const userId = 'clpgycwo2000008k19g3f3cby'
