@@ -1,22 +1,15 @@
 // pages/api/auth/[...nextauth].ts
 
-import { NextApiHandler } from 'next';
-import NextAuth, { NextAuthOptions } from 'next-auth';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import GitHubProvider from 'next-auth/providers/github';
+import NextAuth, { NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
-import EmailProvider from "next-auth/providers/email"
-import prisma from '../../../lib/prisma';
-import { compare } from 'bcrypt';
-import { User } from '@prisma/client'
-import jwt from 'jsonwebtoken';
+import prisma from "../../../lib/prisma";
+import { compare } from "bcrypt";
+import { User } from "@prisma/client";
+import jwt from "jsonwebtoken";
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    // GitHubProvider({
-    //   clientId: process.env.GITHUB_ID,
-    //   clientSecret: process.env.GITHUB_SECRET,
-    // }),
     CredentialsProvider({
       // The name to display on the sign in form (e.g. "Sign in with...")
       name: "Credentials",
@@ -26,7 +19,7 @@ export const authOptions: NextAuthOptions = {
       // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
         email: { label: "Email", type: "text", placeholder: "jsmith" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials, _) {
         const { email, password } = credentials as {
@@ -45,15 +38,13 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        const accessToken = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const accessToken = jwt.sign(user, process.env.JWT_SECRET, {
+          expiresIn: "1h",
+        });
         // user.accessToken = accessToken;
 
         return user;
       },
-    }),
-    EmailProvider({
-      server: process.env.MAIL_SERVER,
-      from: "<no-reply@example.com>",
     }),
   ],
   adapter: PrismaAdapter(prisma),
@@ -89,7 +80,7 @@ export const authOptions: NextAuthOptions = {
   // },
   pages: {
     signIn: "/login",
-  }
+  },
 };
 
-export default NextAuth(authOptions)
+export default NextAuth(authOptions);

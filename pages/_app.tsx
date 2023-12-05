@@ -17,51 +17,39 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+  pageProps: any;
 };
 
-const App = ({ Component, pageProps }: AppPropsWithLayout) => {
+const App = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppPropsWithLayout) => {
   const getLayout = Component.getLayout || ((page) => <Layout>{page}</Layout>);
 
+  console.log(Component.auth);
   return (
-    <>
-      {getLayout(<Component {...pageProps} />)}
-      <ToastContainer
-        position="bottom-left"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-    </>
+    <SessionProvider session={session}>
+      {Component.auth !== false ? (
+        <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
+      ) : (
+        <>
+          {getLayout(<Component {...pageProps} />)}
+          <ToastContainer
+            position="bottom-left"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </>
+      )}
+    </SessionProvider>
   );
-
-  // return (
-  //   <SessionProvider session={pageProps.session}>
-  //     {/* {Component.auth !== false ? (
-  //       <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
-  //     ) : (
-  //       getLayout(<Component {...pageProps} />)
-  //     )} */}
-  //     {getLayout(<Component {...pageProps} />)}
-  //     <ToastContainer
-  //       position="bottom-left"
-  //       autoClose={5000}
-  //       hideProgressBar={false}
-  //       newestOnTop={false}
-  //       closeOnClick
-  //       rtl={false}
-  //       pauseOnFocusLoss
-  //       draggable
-  //       pauseOnHover
-  //       theme="light"
-  //     />
-  //   </SessionProvider>
-  // );
 };
 
 export default App;
