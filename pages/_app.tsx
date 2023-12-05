@@ -29,7 +29,7 @@ const App = ({
 }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout || ((page) => <Layout>{page}</Layout>);
 
-  console.log(Component.auth);
+  console.log("session: ", session);
   return (
     <SessionProvider session={session}>
       {Component.auth !== false ? (
