@@ -9,6 +9,7 @@ import type { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import "react-toastify/dist/ReactToastify.css";
 import "pages/index.css";
+import { Session } from "next-auth";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -17,7 +18,9 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
-  pageProps: any;
+  pageProps: {
+    session: Session | null;
+  };
 };
 
 const App = ({
