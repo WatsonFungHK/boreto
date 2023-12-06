@@ -54,7 +54,6 @@ export const authOptions = (req, res): NextAuthOptions => {
     ],
     adapter: adapter,
     secret: process.env.NEXTAUTH_SECRET,
-    // session: { strategy: "jwt" },
     jwt: {
       encode(params) {
         if (
