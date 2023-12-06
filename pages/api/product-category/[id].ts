@@ -5,12 +5,14 @@ import cuid from "cuid";
 import { getSession } from "next-auth/react";
 import { companyId } from "pages/api/constants";
 import supabase from "../../../lib/supabase";
+import { getServerSideProps } from "../../../pages/index";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
+    const session = await getServerSideProps({ req, res });
     if (req.method === "GET") {
       const response = await prisma.productCategory.findUnique({
         where: {

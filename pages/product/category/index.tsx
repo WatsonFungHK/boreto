@@ -8,6 +8,7 @@ import type { Column } from "components/BasicTable";
 import { useState } from "react";
 import DebouncedInput from "components/DebouncedInput";
 import { columns } from "../../../constants/category";
+import { useSession } from "next-auth/react";
 
 const fetcher = async ({ url, filters }) => {
   const queryParams = new URLSearchParams(filters).toString();

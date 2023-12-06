@@ -28,7 +28,6 @@ const App = ({
   pageProps: { session, ...pageProps },
 }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout || ((page) => <Layout>{page}</Layout>);
-
   return (
     <SessionProvider session={session}>
       {Component.auth !== false ? (
