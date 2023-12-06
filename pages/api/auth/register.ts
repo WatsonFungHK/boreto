@@ -1,6 +1,7 @@
 import prisma from "../../../lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { hash } from "bcrypt";
+import supabase from "../../../lib/supabase";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,14 +16,25 @@ export default async function handler(
   if (exists) {
     res.status(400).send({ error: "User already exists" });
   } else {
+    const hashedPassword = await hash(password, 10);
+
     const user = await prisma.user.create({
       data: {
         first_name,
         last_name,
         email,
-        password: await hash(password, 10),
+        password: hashedPassword,
+        Account: {
+          create: {
+            type: "credentials",
+            provider: "credentials",
+            providerAccountId: email,
+          },
+        },
       },
     });
+
+    console.log(user);
     res.status(200).json(user);
   }
 }

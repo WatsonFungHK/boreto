@@ -8,7 +8,7 @@ import DashboardPage from "./dashboard";
 export async function getServerSideProps({ req, res }) {
   return {
     props: {
-      session: await getServerSession(req, res, authOptions),
+      session: await getServerSession(req, res, authOptions(req, res)),
     },
   };
 }
