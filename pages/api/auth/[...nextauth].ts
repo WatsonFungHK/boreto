@@ -113,6 +113,9 @@ export const authOptions = (req, res): NextAuthOptions => {
       async session({ session, token, user }) {
         session.user.companyId = user.companyId;
         session.user.id = user.id;
+        // avoid json serialization error of undefined
+        session.user.name = user.name ?? null;
+        session.user.image = user.image ?? null;
         return session;
       },
     },
