@@ -7,27 +7,33 @@ import { companyId } from "pages/api/constants";
 import supabase from "../../../lib/supabase";
 import { getServerSideProps } from "../../index";
 import { hash } from "bcrypt";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  email: yup.string().email().required(),
+  token: yup.string().required(),
+});
 
 const isResetTokenValid = async (
   token: string,
-  userId: string,
+  email: string,
   res: NextApiResponse
 ) => {
-  const dataFromToken = await prisma.resetPasswordEmail.findFirst({
-    where: { token },
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { ResetPasswordEmail: true },
   });
-  if (dataFromToken === null || dataFromToken?.userId !== userId) {
+  const tokenFromUser = user?.ResetPasswordEmail?.token;
+  if (tokenFromUser !== token) {
     res.status(400).send({ message: "invalid token" });
-    return false;
+    return null;
   }
 
-  console.log(new Date());
-  console.log(dataFromToken.expiredAt);
-  if (new Date() > dataFromToken.expiredAt) {
+  if (new Date() > tokenFromUser.expiredAt) {
     res.status(400).send({ message: "token expired" });
-    return false;
+    return null;
   }
-  return true;
+  return user;
 };
 
 export default async function handler(
@@ -35,31 +41,31 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    if (req.method === "GET") {
-      const {
-        props: { session },
-      } = await getServerSideProps({ req, res });
-      const { token } = req.query;
-      console.log(req.query);
+    console.log(req.query);
+    try {
+      await schema.validate(req.query);
+    } catch (error) {
+      res.status(400).json({ errors: error.errors });
+      return;
+    }
 
-      const ok = await isResetTokenValid(String(token), session.user.id, res);
-      if (!ok) return;
+    if (req.method === "GET") {
+      const { token, email } = req.query;
+
+      const user = await isResetTokenValid(String(token), email, res);
+      if (!user) return;
 
       res.status(200).json({ message: "ok" });
       return;
     } else if (req.method === "POST") {
-      const {
-        props: { session },
-      } = await getServerSideProps({ req, res });
-      const userId = session.user.id;
-      const { token } = req.query;
+      const { token, email } = req.query;
 
-      const ok = await isResetTokenValid(String(token), userId, res);
-      if (!ok) return;
+      const user = await isResetTokenValid(String(token), email, res);
+      if (!user) return;
 
       const { password } = req.body;
       await prisma.user.update({
-        where: { id: userId },
+        where: { id: user.id },
         data: {
           password: await hash(password, 10),
         },

@@ -29,6 +29,7 @@ export default async function handler(
         await schema.validate(req.body);
       } catch (error) {
         res.status(400).json({ errors: error.errors });
+        return;
       }
 
       const { email } = req.body;
@@ -39,6 +40,7 @@ export default async function handler(
       });
       if (!user) {
         res.status(404).json({ message: "user not found" });
+        return;
       }
       const userId = user.id;
       const data = {
