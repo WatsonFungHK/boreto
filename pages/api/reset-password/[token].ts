@@ -29,7 +29,7 @@ const isResetTokenValid = async (
     return null;
   }
 
-  if (new Date() > tokenFromUser.expiredAt) {
+  if (new Date() > user.ResetPasswordEmail?.expiredAt) {
     res.status(400).send({ message: "token expired" });
     return null;
   }
