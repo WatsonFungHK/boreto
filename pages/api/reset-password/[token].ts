@@ -52,7 +52,7 @@ export default async function handler(
     if (req.method === "GET") {
       const { token, email } = req.query;
 
-      const user = await isResetTokenValid(String(token), email, res);
+      const user = await isResetTokenValid(String(token), String(email), res);
       if (!user) return;
 
       res.status(200).json({ message: "ok" });
@@ -60,7 +60,7 @@ export default async function handler(
     } else if (req.method === "POST") {
       const { token, email } = req.query;
 
-      const user = await isResetTokenValid(String(token), email, res);
+      const user = await isResetTokenValid(String(token), String(email), res);
       if (!user) return;
 
       const { password } = req.body;
