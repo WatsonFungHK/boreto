@@ -7,6 +7,11 @@ import { companyId } from "pages/api/constants";
 import supabase from "../../../lib/supabase";
 import { getServerSideProps } from "../../index";
 import { randomUUID } from "crypto";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  email: yup.string().email().required(),
+});
 
 const getExpiredTime = () => {
   const expiredMinutes =
@@ -20,15 +25,27 @@ export default async function handler(
 ) {
   try {
     if (req.method === "POST") {
-      const {
-        props: { session },
-      } = await getServerSideProps({ req, res });
-      const userId = session.user.id;
+      try {
+        await schema.validate(req.body);
+      } catch (error) {
+        res.status(400).json({ errors: error.errors });
+      }
+
+      const { email } = req.body;
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+      if (!user) {
+        res.status(404).json({ message: "user not found" });
+      }
+      const userId = user.id;
       const data = {
         token: randomUUID(),
         expiredAt: getExpiredTime(),
       };
-      const response = await prisma.resetPasswordEmail.upsert({
+      await prisma.resetPasswordEmail.upsert({
         where: { userId },
         create: {
           ...data,
@@ -41,7 +58,7 @@ export default async function handler(
         update: data,
       });
       // TOOD send email
-      res.status(200).json(response);
+      res.status(200).json({ message: "success" });
       return;
     } else {
       res.status(405).json({ message: "method not supported" });
