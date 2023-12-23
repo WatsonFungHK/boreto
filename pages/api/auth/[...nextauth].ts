@@ -42,6 +42,7 @@ export const authOptions = (req, res): NextAuthOptions => {
             where: {
               email,
             },
+            // TODO include admin and permissions
           });
 
           if (!user || !(await compare(password, user?.password))) {
