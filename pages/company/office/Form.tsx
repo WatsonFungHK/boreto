@@ -21,6 +21,7 @@ import { string, object, array } from "yup";
 import AddressForm, { addressSchema } from "components/AddressForm";
 import Autocomplete from "components/Autocomplete";
 import useStaffOptions from "../../../hooks/useStaffOptions";
+import { useSession } from "next-auth/react";
 
 const defaultValues = {
   name: "",

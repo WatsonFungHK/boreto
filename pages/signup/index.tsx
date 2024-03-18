@@ -62,10 +62,10 @@ const SignUpForm = ({ csrfToken }) => {
 
       await signIn("credentials", {
         redirect: true,
-        email: formData.email,
-        password: formData.password,
+        ...formData,
         csrfToken,
         // @ts-ignore
+        callbackUrl: `${window.location.origin}/company/office/new`,
       });
     } catch (error) {
       toast.error(error.response.data.error);

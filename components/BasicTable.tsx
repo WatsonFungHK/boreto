@@ -48,8 +48,6 @@ export default function BasicTable({
   const { t } = useTranslation();
 
   const defaultOnClick = (row) => () => {
-    console.log({ row });
-
     if (typeof onRowClick === "function") {
       onRowClick(row);
     } else {
